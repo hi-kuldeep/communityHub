@@ -5,18 +5,19 @@ import styles from './Login.style';
 import usLogin from './usLogin';
 import { CustomInput, PasswordInput } from '@/components/input';
 import ThemeToggle from '@/components/ThemeToggle';
+import Container from '@/components/container/Container';
 
 const Login = () => {
   const {
     form: { getInputProps },
   } = usLogin();
   return (
-    <View style={{ marginTop: 120 }}>
+    <Container containerStyle={{ marginTop: 20 }}>
       <CustomText>Login</CustomText>
       <ThemeToggle />
       <PasswordInput {...getInputProps('email')} />
       <CustomInput />
-    </View>
+    </Container>
   );
 };
 

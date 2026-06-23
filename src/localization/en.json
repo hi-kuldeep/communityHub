@@ -6,7 +6,9 @@
     "offline": "You are currently offline",
     "back": "Back",
     "cancel": "Cancel",
-    "ok": "OK"
+    "ok": "OK",
+    "noDataFound": "No Data Found",
+    "pleaseWait": "Please wait..."
   },
   "placeholder": {
     "title": "Community Hub",
