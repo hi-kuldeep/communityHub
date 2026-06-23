@@ -1,22 +1,11 @@
-import { Platform } from 'react-native';
+import { FONTS } from './fonts';
 
 export const typography = {
   fonts: {
-    primary: Platform.select({
-      ios: 'System',
-      android: 'sans-serif',
-      default: 'System',
-    }),
-    primaryMedium: Platform.select({
-      ios: 'System',
-      android: 'sans-serif-medium',
-      default: 'System',
-    }),
-    primaryBold: Platform.select({
-      ios: 'System',
-      android: 'sans-serif-bold',
-      default: 'System',
-    }),
+    primary: FONTS.regular,
+    primaryMedium: FONTS.medium,
+    primarySemiBold: FONTS.semiBold,
+    primaryBold: FONTS.bold,
   },
   
   sizes: {
@@ -48,36 +37,43 @@ export const typography = {
   
   presets: {
     heading1: {
+      fontFamily: FONTS.bold,
       fontSize: 32,
       lineHeight: 42,
       fontWeight: '700',
     },
     heading2: {
+      fontFamily: FONTS.bold,
       fontSize: 24,
       lineHeight: 34,
       fontWeight: '700',
     },
     heading3: {
+      fontFamily: FONTS.semiBold,
       fontSize: 20,
       lineHeight: 30,
       fontWeight: '600',
     },
     bodyLarge: {
+      fontFamily: FONTS.regular,
       fontSize: 16,
       lineHeight: 24,
       fontWeight: '400',
     },
     bodyMedium: {
+      fontFamily: FONTS.regular,
       fontSize: 14,
       lineHeight: 20,
       fontWeight: '400',
     },
     bodySmall: {
+      fontFamily: FONTS.regular,
       fontSize: 12,
       lineHeight: 16,
       fontWeight: '400',
     },
     button: {
+      fontFamily: FONTS.semiBold,
       fontSize: 16,
       lineHeight: 24,
       fontWeight: '600',
