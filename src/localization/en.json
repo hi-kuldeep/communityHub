@@ -16,5 +16,23 @@
     "switchLanguage": "Switch Language (Español)",
     "switchToDarkMode": "Switch to Dark Mode",
     "switchToLightMode": "Switch to Light Mode"
+  },
+  "login": {
+    "welcomeBack": "Welcome Back",
+    "subtitle": "Sign in to continue managing your account securely.",
+    "emailLabel": "Email Address",
+    "emailPlaceholder": "name@company.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign In",
+    "noAccount": "Don't have an account? ",
+    "signUp": "Sign up"
+  },
+  "validation": {
+    "emailRequired": "Email is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least 6 characters"
   }
 }

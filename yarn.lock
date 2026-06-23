@@ -1722,6 +1722,15 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
+"@react-navigation/bottom-tabs@^7.18.2":
+  version "7.18.2"
+  resolved "https://registry.yarnpkg.com/@react-navigation/bottom-tabs/-/bottom-tabs-7.18.2.tgz#0d3c9debb74f15f1a0b98ffa37e085ec22ce6a2b"
+  integrity sha512-ZzeBTo0HPyqMQfbX7PIPm6z5lDS+UM+cHWxP/0I1RlzCAJnUa+MELWOHGTo/IVsajsnfs8h4laFoQaeXZRX5WA==
+  dependencies:
+    "@react-navigation/elements" "^2.9.25"
+    color "^4.2.3"
+    sf-symbols-typescript "^2.1.0"
+
 "@react-navigation/core@^7.21.1":
   version "7.21.1"
   resolved "https://registry.npmjs.org/@react-navigation/core/-/core-7.21.1.tgz"
@@ -1757,7 +1766,7 @@
 
 "@react-navigation/native@^7.3.3":
   version "7.3.3"
-  resolved "https://registry.npmjs.org/@react-navigation/native/-/native-7.3.3.tgz"
+  resolved "https://registry.yarnpkg.com/@react-navigation/native/-/native-7.3.3.tgz#6874b7f46959479fe0a5820ceaaedb6e9785561c"
   integrity sha512-VjZngfeiyJestZPT99CKHRi3qOR6XwnEEPWb6uHF/L7fBI6RBVP842iJf61MUHRTzsWPUT+epJqdf1wm8N5YkQ==
   dependencies:
     "@react-navigation/core" "^7.21.1"
@@ -6057,12 +6066,12 @@ react-native-reanimated@^4.4.1:
 
 react-native-safe-area-context@^5.8.0:
   version "5.8.0"
-  resolved "https://registry.npmjs.org/react-native-safe-area-context/-/react-native-safe-area-context-5.8.0.tgz"
+  resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.8.0.tgz#d2fb9fc8e0f0583311e261dc484b95ceb80f8902"
   integrity sha512-t+ZsAVzY/wWzzx34vqGbo3/as9EEESJdbyZNL7Yg5EYX+toYMtMqFoDDCvqZUi35eeGVsXc6pAaEk4edMwbuCQ==
 
 react-native-screens@^4.25.2:
   version "4.25.2"
-  resolved "https://registry.npmjs.org/react-native-screens/-/react-native-screens-4.25.2.tgz"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.25.2.tgz#f12c3d8d2cb9d69e1267af1bbba1b37d1d05452d"
   integrity sha512-1Nj1fusFd+rIMKU/qC9yGKVG+3ofh11d3OdBQKL1iVvQfKvcB8vhvTGQf2TkfxW3bamxN+hCZIXmNuU0mRkyDg==
   dependencies:
     react-freeze "^1.0.0"
