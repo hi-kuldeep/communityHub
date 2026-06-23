@@ -4,11 +4,15 @@
     "error": "Something went wrong",
     "retry": "Retry",
     "offline": "You are currently offline",
-    "back": "Back"
+    "back": "Back",
+    "cancel": "Cancel",
+    "ok": "OK"
   },
   "placeholder": {
     "title": "Community Hub",
     "description": "Welcome to the Community Hub! Phase 1: Project Foundation is successfully loaded with localization.",
-    "switchLanguage": "Switch Language (Español)"
+    "switchLanguage": "Switch Language (Español)",
+    "switchToDarkMode": "Switch to Dark Mode",
+    "switchToLightMode": "Switch to Light Mode"
   }
 }

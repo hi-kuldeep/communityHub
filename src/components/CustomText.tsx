@@ -13,9 +13,10 @@ import {
 } from 'react-native';
 
 import { FONTS } from '@/theme/fonts';
-import { COLORS, ThemeColor } from '@/theme/colors';
+import { getColors, ThemeColor } from '@/theme/colors';
 import { theme, TypographyPreset } from '@/theme';
 import { spacingStyle } from '@/types/styleType';
+import { useThemeStore } from '@/store/useThemeStore';
 import { capitalizeString, fontSizePixelRatio } from '@/utils/developmentFunctions';
 
 export type TypographySize = keyof typeof theme.typography.sizes;
@@ -84,12 +85,14 @@ export default function CustomText({
     return numberOfLines;
   };
 
+  const { themeMode } = useThemeStore();
+  const currentColors = getColors(themeMode);
   const resolvedPreset = preset ? theme.typography.presets[preset] : undefined;
-  const resolvedColor = colorCode ?? COLORS[color]; // Use customColor if provided, otherwise use COLORS key
+  const resolvedColor = colorCode ?? currentColors[color]; // Use customColor if provided, otherwise use COLORS key
   // Flatten the style array (if it's an array) or use the single style object
   const flattenedStyle = StyleSheet.flatten(style);
   // Resolve fontSize: use flattenedStyle.fontSize if it exists, otherwise use custom prop, preset, or default to 14
-  let resolvedPropFontSize: number | undefined = undefined;
+  let resolvedPropFontSize: number | undefined;
   if (typeof fontSize === 'number') {
     resolvedPropFontSize = fontSize;
   } else if (typeof fontSize === 'string' && fontSize in theme.typography.sizes) {
@@ -141,7 +144,7 @@ export default function CustomText({
                   style={[
                     {
                       fontSize: fontSizePixelRatio(12),
-                      color: COLORS.black,
+                      color: currentColors.text,
                       fontFamily: FONTS.regular,
                     },
                     loadMoreStyle,

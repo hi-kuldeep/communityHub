@@ -23,6 +23,7 @@ export const colors = {
   white: '#FFFFFF',
   
   dark: {
+    primary: '#4ade80',
     background: '#0F172A',
     surface: '#1E293B',
     text: '#F8FAFC',
@@ -35,3 +36,18 @@ export const COLORS = colors;
 
 export type Colors = typeof colors;
 export type ThemeColor = keyof Omit<Colors, 'dark'>;
+
+export const getColors = (mode: 'light' | 'dark') => {
+  if (mode === 'dark') {
+    return {
+      ...colors,
+      primary: colors.dark.primary,
+      background: colors.dark.background,
+      surface: colors.dark.surface,
+      text: colors.dark.text,
+      textSecondary: colors.dark.textSecondary,
+      border: colors.dark.border,
+    };
+  }
+  return colors;
+};

@@ -1,4 +1,4 @@
-import { View, Text, Keyboard } from 'react-native';
+import { Keyboard } from 'react-native';
 import React from 'react';
 
 const useKeyboardOpenListener = () => {

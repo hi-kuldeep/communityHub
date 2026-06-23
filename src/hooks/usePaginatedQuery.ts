@@ -79,7 +79,7 @@ function useInfinitePaginatedQuery<
   const data = useMemo(() => {
     if (!query.data?.pages) return [];
     return query.data.pages.flat();
-  }, [query.data, query?.isRefetching]);
+  }, [query.data]);
 
   return {
     query,
