@@ -17,7 +17,7 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import Avatar from './imageComponent/Avatar';
 
-interface CustomHeaderProps {
+interface TabHeaderProps {
   title: string;
   location?: string;
   onSettingsPress?: () => void;
@@ -25,7 +25,7 @@ interface CustomHeaderProps {
   navigation?: any; // Add navigation prop for drawer
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({
+const TabHeader: React.FC<TabHeaderProps> = ({
   title,
   location,
   onSettingsPress,
@@ -134,4 +134,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomHeader;
+export default TabHeader;
