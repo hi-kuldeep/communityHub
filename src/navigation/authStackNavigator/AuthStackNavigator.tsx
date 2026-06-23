@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { authStackParam } from './authStackParam';
 import { authStackName } from './authStackName';
 import Login from '@/screens/login/Login';
+import CustomHeader from '@/components/CustomHeader';
 
 const AuthStack = createNativeStackNavigator<authStackParam>();
 const { Navigator, Screen } = AuthStack;
@@ -14,7 +15,8 @@ const AuthStackNavigator = () => {
         gestureEnabled: true,
         gestureDirection: 'horizontal',
         fullScreenGestureEnabled: true,
-        headerShown: false,
+        headerShown: true,
+        header: () => <CustomHeader title="asd" />,
       }}
     >
       <Screen name={authStackName.LOGIN} component={Login} />
