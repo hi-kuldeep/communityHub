@@ -1,10 +1,14 @@
-import { View, Text } from 'react-native';
 import React from 'react';
+import { Text, View } from 'react-native';
+import CustomText from '@/components/CustomText';
+import styles from './Login.style';
+import usLogin from './usLogin';
 
 const Login = () => {
+  const { form } = usLogin();
   return (
     <View>
-      <Text>Login</Text>
+      <CustomText>Login</CustomText>
     </View>
   );
 };

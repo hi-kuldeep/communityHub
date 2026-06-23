@@ -73,3 +73,15 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Agent / IDE metadata files
+.cursorrules
+AGENTS.md
+GEMINI.md
+PROJECT_CONTEXT.md
+README_TASK.md
+phases.md
+
+
+# Bundler
+.bundle/
