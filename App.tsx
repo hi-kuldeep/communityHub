@@ -10,7 +10,7 @@ import {
 } from '@react-navigation/native';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/services/queryClient';
-import { RootNavigator } from '@/navigation/RootNavigator';
+import RootStackNavigator from '@/navigation/rootStackNavigator/RootStackNavigator';
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import ModalProvider from '@/components/modalProvider/ModalProvider';
@@ -49,7 +49,7 @@ function App(): React.JSX.Element {
                 backgroundColor={colors.background}
               />
               <ModalProvider>
-                <RootNavigator />
+                <RootStackNavigator />
               </ModalProvider>
             </NavigationContainer>
           </QueryClientProvider>
