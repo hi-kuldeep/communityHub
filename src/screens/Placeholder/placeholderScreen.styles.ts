@@ -10,13 +10,8 @@ export const styles = StyleSheet.create({
     padding: theme.spacing.screenPadding,
   },
   title: {
-    fontFamily: theme.typography.fonts.primaryBold,
-    fontSize: theme.typography.sizes.xxl,
-    lineHeight: theme.typography.lineHeights.xxl,
-    color: theme.colors.primary,
     marginBottom: theme.spacing.sm,
     textAlign: 'center',
-    fontWeight: theme.typography.weights.bold,
   },
   subtitle: {
     fontFamily: theme.typography.fonts.primary,

@@ -19,6 +19,9 @@ export const colors = {
   success: '#3dad49',
   warning: '#F59E0B',
   
+  black: '#000000',
+  white: '#FFFFFF',
+  
   dark: {
     background: '#0F172A',
     surface: '#1E293B',
@@ -27,6 +30,8 @@ export const colors = {
     border: '#334155',
   }
 } as const;
+
+export const COLORS = colors;
 
 export type Colors = typeof colors;
 export type ThemeColor = keyof Omit<Colors, 'dark'>;

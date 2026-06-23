@@ -1,16 +1,18 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { usePlaceholderScreen } from './usePlaceholderScreen';
 import { styles } from './placeholderScreen.styles';
+import CustomText from '@/components/CustomText';
 
 const PlaceholderScreen: React.FC = () => {
-  const { title, description, handlePress } = usePlaceholderScreen();
+  const { title, handlePress } = usePlaceholderScreen();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{description}</Text>
+        <CustomText fontFamily="bold" color="primary">
+          {title}
+        </CustomText>
       </TouchableOpacity>
     </View>
   );
