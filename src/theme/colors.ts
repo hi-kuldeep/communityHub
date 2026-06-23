@@ -1,10 +1,10 @@
 export const colors = {
-  primary: '#3B82F6', // Vibrant blue
-  primaryDark: '#1D4ED8',
-  primaryLight: '#DBEAFE',
+  primary: '#3dad49', // Mid-tone green
+  primaryDark: '#2c8135',
+  primaryLight: '#eaf7eb',
   
-  secondary: '#10B981', // Emerald green
-  secondaryDark: '#047857',
+  secondary: '#3b82f6', // Vibrant blue as secondary
+  secondaryDark: '#1d4ed8',
   
   background: '#F9FAFB',
   surface: '#FFFFFF',
@@ -16,7 +16,7 @@ export const colors = {
   
   border: '#E5E7EB',
   error: '#EF4444',
-  success: '#10B981',
+  success: '#3dad49',
   warning: '#F59E0B',
   
   dark: {
