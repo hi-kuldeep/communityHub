@@ -6,6 +6,7 @@ import CustomText from '@/components/CustomText';
 import CustomButton from '@/components/CustomButton';
 import { showModal } from '@/components/modalProvider/ModalProvider';
 import { useTranslation } from 'react-i18next';
+import ReuseableModalizeBottomSheet from '@/components/reuseableModalizeBottomSheet/ReuseableModalizeBottomSheet';
 
 const PlaceholderScreen: React.FC = () => {
   const { title, description, themeMode, toggleThemeMode, handlePress } =
@@ -43,6 +44,14 @@ const PlaceholderScreen: React.FC = () => {
       >
         Show Modal
       </CustomButton>
+
+      <ReuseableModalizeBottomSheet
+        actionElement={
+          <CustomButton style={{ marginTop: 29 }}>
+            Show Bottom Sheet
+          </CustomButton>
+        }
+      />
     </View>
   );
 };
