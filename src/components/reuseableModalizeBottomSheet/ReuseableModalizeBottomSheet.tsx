@@ -12,9 +12,12 @@ import {
   View,
   TouchableOpacityProps,
   PressableProps,
+  StyleSheet,
 } from 'react-native';
 import { Modalize, ModalizeProps, useModalize } from 'react-native-modalize';
 import { Portal } from 'react-native-portalize';
+import { getColors } from '@/theme/colors';
+import { useThemeStore } from '@/store/useThemeStore';
 
 // Union of props to support both
 type AllowedTouchable =
@@ -46,6 +49,8 @@ const ReuseableModalizeBottomSheet: React.FC<ReuseableModalizeBottomSheet> = ({
   ...props
 }) => {
   const { ref, open, close } = useModalize();
+  const { themeMode } = useThemeStore();
+  const colors = getColors(themeMode);
 
   // External control: open/close via isOpen prop
   useEffect(() => {
@@ -98,15 +103,9 @@ const ReuseableModalizeBottomSheet: React.FC<ReuseableModalizeBottomSheet> = ({
           useNativeDriver
           modalTopOffset={50}
           handlePosition="inside"
-          modalStyle={{
-            padding: 20,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            minHeight,
-          }}
-          rootStyle={{
-            backgroundColor: 'rgba(0, 46, 107, 0.3)',
-          }}
+          modalStyle={[styles.modal, { backgroundColor: colors.surface, minHeight }]}
+          handleStyle={[styles.handle, { backgroundColor: colors.border }]}
+          rootStyle={styles.root}
           {...props}
         >
           {children ? cloneElement(children, { close } as any) : children}
@@ -115,5 +114,21 @@ const ReuseableModalizeBottomSheet: React.FC<ReuseableModalizeBottomSheet> = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  modal: {
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  root: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  handle: {
+    height: 6,
+    width: 40,
+    borderRadius: 3,
+  },
+});
 
 export default ReuseableModalizeBottomSheet;
