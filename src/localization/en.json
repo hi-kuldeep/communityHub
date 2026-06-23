@@ -1,0 +1,14 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "offline": "You are currently offline",
+    "back": "Back"
+  },
+  "placeholder": {
+    "title": "Community Hub",
+    "description": "Welcome to the Community Hub! Phase 1: Project Foundation is successfully loaded with localization.",
+    "switchLanguage": "Switch Language (Español)"
+  }
+}

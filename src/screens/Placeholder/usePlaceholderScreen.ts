@@ -1,18 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const usePlaceholderScreen = () => {
-  const [title] = useState('Community Hub');
-  const [description] = useState(
-    'Welcome to the Community Hub! Phase 1: Project Foundation is successfully loaded.'
-  );
+  const { t } = useTranslation();
 
   const handlePress = useCallback(() => {
     console.log('Placeholder screen interaction');
   }, []);
 
   return {
-    title,
-    description,
+    title: t('placeholder.title'),
+    description: t('placeholder.description'),
     handlePress,
   };
 };
