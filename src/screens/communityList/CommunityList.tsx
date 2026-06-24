@@ -42,7 +42,7 @@ const CommunityList = () => {
     ({ item }: { item: any }) => (
       <CommunityCard item={item} onPress={onPressCommunity} />
     ),
-    [onPressCommunity]
+    [onPressCommunity],
   );
 
   const renderFooter = React.useCallback(() => {
@@ -67,7 +67,11 @@ const CommunityList = () => {
       return (
         <View style={styles.loadingContainer}>
           <Error text={t('common.error')}>
-            <CustomButton mode="filled" onPress={() => refetch()} style={styles.retryButton}>
+            <CustomButton
+              mode="filled"
+              onPress={() => refetch()}
+              style={styles.retryButton}
+            >
               {t('common.retry')}
             </CustomButton>
           </Error>
@@ -78,16 +82,25 @@ const CommunityList = () => {
     if (isEmpty) {
       return (
         <View style={styles.loadingContainer}>
-          <Empty text={search ? t('communityList.noCommunitiesFound') : t('common.noDataFound')} />
+          <Empty
+            text={
+              search
+                ? t('communityList.noCommunitiesFound')
+                : t('common.noDataFound')
+            }
+          />
         </View>
       );
     }
+    console.log('communities', communities);
 
     return (
       <FlashList
         data={communities}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
+        extraData={sort}
+        maintainVisibleContentPosition={{ disabled: true }} // To allow clean rendering of sorted data without viewport anchoring shifts.
         onEndReached={onEndReached}
         onEndReachedThreshold={0.4}
         contentContainerStyle={styles.listContainer}
@@ -104,7 +117,11 @@ const CommunityList = () => {
   };
 
   return (
-    <Container isScrollable={false} isSaferAreaView={true} containerStyle={styles.container}>
+    <Container
+      isScrollable={false}
+      isSaferAreaView={true}
+      containerStyle={styles.container}
+    >
       <View style={styles.content}>
         <SearchBar value={search} onChangeText={setSearch} />
         <SortFilter selected={sort} onSelect={onSelectSort} />
