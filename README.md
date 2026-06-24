@@ -15,7 +15,7 @@
 - **🔒 Session Security (Mocked)**: Email/password authentication flow backed by a Zustand session manager. The sensitive authorization token is securely stored in device keychain using `react-native-keychain`, while non-sensitive user metadata is persisted in `AsyncStorage` to automatically restore session status across restarts.
 - **📋 High-Performance Listings**: Paginated list of communities using `@shopify/flash-list` for smooth 60fps rendering, supporting search queries, multiple sorting methods (`name_asc`, `name_desc`, `members_desc`), and pull-to-refresh.
 - **💬 Interactive Communities**: Tab-organized screens to inspect community details and statistics alongside a separate scrollable posts stream, complete with independent pull-to-refresh behaviors.
-- **📝 Optimistic Posting Form**: Post creation screen powered by `react-hook-form` and `yup` validation. Submissions appear immediately in the feed using optimistic React Query updates, with full error handling and manual retry buttons for failed requests.
+- **📝 Optimistic Posting Form**: Post creation screen powered by `formik` and `yup` validation. Submissions appear immediately in the feed using optimistic React Query updates, with full error handling and manual retry buttons for failed requests.
 - **📶 Offline Resilience**: Global network listening via `NetInfo` that triggers a subtle offline banner. Reads load instantly from the local query cache, and offline actions (like joining/leaving a community) are held inside a synchronized queue and executed automatically when connection recovers.
 - **🎨 Premium Fluid Design**: Sleek dark-mode compatible design system featuring glassmorphic floating docks, subtle animations using `react-native-reanimated`, custom loading micro-interactions, and visual states.
 - **🚀 Native Splash Screens**: Clean, edge-to-edge native launch views matching the design theme on both iOS (LaunchScreen.storyboard auto-layout) and Android (`react-native-splash-view` overlay).
@@ -151,6 +151,18 @@ The offline architecture guarantees the application remains stable and functiona
 
 > [!IMPORTANT] > **Testing Offline Flow on Simulators / Emulators**:
 > Due to Apple Simulator and Android Emulator networking loopback behaviors, toggling your host computer's Wi-Fi connection off and on may not reliably broadcast network state updates to `react-native-netinfo` inside the virtualized environment. For a consistent evaluation, it is recommended to test the offline-first sync engine on a **real physical device** (toggling Wi-Fi/cellular connection) or by disabling network access directly within the simulator's internal cellular/Wi-Fi developer settings.
+
+---
+
+## ⚡ Performance Optimization Strategy
+
+The application adopts key React Native performance best practices to ensure a fluid 60fps experience:
+
+- **📋 Efficient List Rendering (FlashList & Memoized Renderers)**: Replaced standard `FlatList` with `@shopify/flash-list` in [CommunityList.tsx](file:///Users/kuldeep/kuldeep/communityHub/src/screens/communityList/CommunityList.tsx) and [CommunityDetails.tsx](file:///Users/kuldeep/kuldeep/communityHub/src/screens/communityDetails/CommunityDetails.tsx), using `estimatedItemSize` to prevent layout shifts. The `renderItem` methods are memoized via `useCallback` and list card components are wrapped in `React.memo` to eliminate redundant layout runs.
+- **🖼️ High-Performance Image Caching (FastImage)**: Used `react-native-fast-image` (in [ImageComponent.tsx](file:///Users/kuldeep/kuldeep/communityHub/src/components/imageComponent/ImageComponent.tsx) and [Avatar.tsx](file:///Users/kuldeep/kuldeep/communityHub/src/components/imageComponent/Avatar.tsx)) to perform aggressive memory/disk caching and prioritize image rendering directly at the native OS layer.
+- **⚡ Lightweight Form & Schema Validation (Formik & Yup)**: Leveraged `formik` to isolate input state changes and prevent parent re-renders. Combined with `yup` validation schemas memoized via `useMemo` to prevent rebuilding schemas on every render cycle.
+- **🔄 Caching, Pull-to-Refresh & Pagination**: Utilized TanStack Query's caching (`staleTime` & `gcTime`) for instant loading on screen navigation. Configured end-of-scroll pagination via `onEndReached` and pull-to-refresh to fetch updates in the background.
+- **🔄 Avoiding Re-renders & Proper Memoization**: Leveraged granular Zustand slice selectors, `useCallback` for event handlers, and `useMemo` for filtering/sorting computations to maintain strict reference equality across renders.
 
 ---
 
