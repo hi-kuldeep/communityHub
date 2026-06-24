@@ -2,13 +2,11 @@ import { useState, useCallback, useMemo } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { fetchCommunityDetails, toggleCommunityJoin } from '@/services/api/communityService';
+import { fetchCommunityDetails } from '@/services/api/communityService';
 import { fetchCommunityPosts, createPost } from '@/services/api/postService';
 import { rootStackParams } from '@/navigation/rootStackNavigator/rootStackParams';
 import { rootStackName } from '@/navigation/rootStackNavigator/rootStackName';
-import { useNetworkStore } from '@/store/useNetworkStore';
-import { useOfflineQueueStore } from '@/store/useOfflineQueueStore';
-import { showModal } from '@/components/modalProvider/ModalProvider';
+import { useCommunityJoinQueue } from '@/hooks/useCommunityJoinQueue';
 
 export const useCommunityDetails = () => {
   const { t } = useTranslation();
@@ -33,111 +31,23 @@ export const useCommunityDetails = () => {
     retry: 2,
   });
 
-  // 3. Mutation for Join/Leave Toggle
-  const toggleMutation = useMutation({
-    mutationFn: (newJoinedState: boolean) =>
-      toggleCommunityJoin(communityId, newJoinedState),
-    onMutate: async (newJoinedState) => {
-      // Cancel outgoing queries to avoid overwriting our optimistic update
-      await queryClient.cancelQueries({ queryKey: ['communityDetails', communityId] });
-      await queryClient.cancelQueries({ queryKey: ['communities'] });
-
-      // Snapshot previous value
-      const previousDetails = queryClient.getQueryData<ICommunity>([
-        'communityDetails',
-        communityId,
-      ]);
-
-      // Optimistically update the details cache
-      if (previousDetails) {
-        queryClient.setQueryData<ICommunity>(
-          ['communityDetails', communityId],
-          {
-            ...previousDetails,
-            joined: newJoinedState,
-            memberCount:
-              previousDetails.memberCount + (newJoinedState ? 1 : -1),
-          }
-        );
-      }
-
-      // Return context with rollback info
-      return { previousDetails };
-    },
-    onError: (err, newJoinedState, context) => {
-      // Rollback cache if mutation fails
-      if (context?.previousDetails) {
-        queryClient.setQueryData<ICommunity>(
-          ['communityDetails', communityId],
-          context.previousDetails
-        );
-      }
-    },
-    onSettled: () => {
-      // Always refetch / invalidate to stay in sync with database
-      queryClient.invalidateQueries({ queryKey: ['communityDetails', communityId] });
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-    },
-  });
-
-  const isOnline = useNetworkStore(state => state.isOnline);
-  const enqueue = useOfflineQueueStore(state => state.enqueue);
+  // 3. Integrate offline join/leave queue logic
+  const {
+    handleToggleJoin: triggerToggleJoin,
+    getMergedCommunity,
+    isTogglingJoin,
+  } = useCommunityJoinQueue(communityId);
 
   // 4. Handle Join/Leave Button Press
   const handleToggleJoin = useCallback(() => {
     if (!detailsQuery.data) return;
-    const nextJoinedState = !detailsQuery.data.joined;
-
-    if (!isOnline) {
-      // Offline: Enqueue join/leave action
-      enqueue(communityId, nextJoinedState ? 'join' : 'leave');
-      
-      // Update cache optimistically so that the UI changes instantly
-      queryClient.setQueryData<ICommunity>(
-        ['communityDetails', communityId],
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            joined: nextJoinedState,
-            memberCount: Math.max(0, old.memberCount + (nextJoinedState ? 1 : -1)),
-          };
-        }
-      );
-      
-      // Trigger list refresh
-      queryClient.invalidateQueries({ queryKey: ['communities'] });
-
-      // Notify the user that their request has been queued offline
-      showModal({
-        title: t('common.offline'),
-        message: nextJoinedState
-          ? t('communityDetails.offlineJoinQueued')
-          : t('communityDetails.offlineLeaveQueued'),
-        successTitle: t('common.ok'),
-      });
-    } else {
-      // Online: Run mutation
-      toggleMutation.mutate(nextJoinedState);
-    }
-  }, [detailsQuery.data, toggleMutation, isOnline, enqueue, communityId, queryClient]);
+    triggerToggleJoin(detailsQuery.data.joined);
+  }, [detailsQuery.data, triggerToggleJoin]);
 
   // Merge query cache with offline queue status to guarantee accurate local override
-  const rawCommunity = detailsQuery.data;
-  const getQueuedAction = useOfflineQueueStore(state => state.getQueuedAction);
-  const queuedAction = getQueuedAction(communityId);
-
   const community = useMemo(() => {
-    if (!rawCommunity) return undefined;
-    if (!queuedAction) return rawCommunity;
-    const isJoined = queuedAction === 'join';
-    if (rawCommunity.joined === isJoined) return rawCommunity;
-    return {
-      ...rawCommunity,
-      joined: isJoined,
-      memberCount: Math.max(0, rawCommunity.memberCount + (isJoined ? 1 : -1)),
-    };
-  }, [rawCommunity, queuedAction]);
+    return getMergedCommunity(detailsQuery.data);
+  }, [detailsQuery.data, getMergedCommunity]);
 
   // 5. Handle pull-to-refresh for posts independently
   const onRefresh = useCallback(async () => {
@@ -227,7 +137,7 @@ export const useCommunityDetails = () => {
     isDetailsError: detailsQuery.isError,
     isPostsLoading: postsQuery.isPending,
     isPostsError: postsQuery.isError,
-    isTogglingJoin: toggleMutation.isPending,
+    isTogglingJoin,
     refreshing,
     onRefresh,
     handleToggleJoin,
