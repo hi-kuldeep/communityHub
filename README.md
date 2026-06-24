@@ -12,7 +12,7 @@
 
 ## 📱 Product Showcase (Key Features)
 
-*   **🔒 Session Security (Mocked)**: Email/password authentication flow backed by a Zustand session manager. The session token is securely persisted in `AsyncStorage` to automatically restore session status across restarts.
+*   **🔒 Session Security (Mocked)**: Email/password authentication flow backed by a Zustand session manager. The sensitive authorization token is securely stored in device keychain using `react-native-keychain`, while non-sensitive user metadata is persisted in `AsyncStorage` to automatically restore session status across restarts.
 *   **📋 High-Performance Listings**: Paginated list of communities using `@shopify/flash-list` for smooth 60fps rendering, supporting search queries, multiple sorting methods (`name_asc`, `name_desc`, `members_desc`), and pull-to-refresh.
 *   **💬 Interactive Communities**: Tab-organized screens to inspect community details and statistics alongside a separate scrollable posts stream, complete with independent pull-to-refresh behaviors.
 *   **📝 Optimistic Posting Form**: Post creation screen powered by `react-hook-form` and `yup` validation. Submissions appear immediately in the feed using optimistic React Query updates, with full error handling and manual retry buttons for failed requests.
@@ -87,7 +87,7 @@ graph TD
         Z --> Z3[Offline Pending Actions Queue]:::client
         
         Z3 -.-> AS[(AsyncStorage Persistence)]:::native
-        Z1 -.-> AS
+        Z1 -.-> KC[(Keychain Storage)]:::native
     end
 ```
 
@@ -180,7 +180,8 @@ sequenceDiagram
 | **React Query (TanStack)** | Redux Async Thunk / Custom Axios Cache | **Justification**: Handles remote caching, query states, retries, pagination, and caching out of the box.<br>**Tradeoff**: Requires understanding of stale/cache timers, but drastically cuts async state boilerplate. |
 | **Zustand** | Redux Toolkit / React Context | **Justification**: Zero-boilerplate global state management. Extremely lightweight, performant, and doesn't trigger parent re-renders. Comes with simple, native `persist` middleware.<br>**Tradeoff**: Lacks complex middleware ecosystems like Redux Sagas, but perfect for lightweight client state. |
 | **Shopify FlashList** | Standard FlatList | **Justification**: Reuses cell views to prevent garbage collection spikes. Ideal for smooth scrolling in long lists.<br>**Tradeoff**: Requires careful item layout sizing to prevent visual layout shifts during view recycling. |
-| **Zustand Persist + AsyncStorage** | SQLite / WatermelonDB | **Justification**: Quick to implement, lightweight, and perfect for simple state persistence like user session and offline sync queues.<br>**Tradeoff**: Not suited for complex relational databases, but highly sufficient for queue/preference operations. |
+| **Zustand Persist + AsyncStorage** | SQLite / WatermelonDB | **Justification**: Quick to implement, lightweight, and perfect for simple state persistence like user preferences and offline sync queues.<br>**Tradeoff**: Not suited for complex relational databases, but highly sufficient for queue/preference operations. |
+| **react-native-keychain** | AsyncStorage | **Justification**: Secures sensitive authorization tokens in the iOS Keychain and Android Keystore, preventing token theft through standard storage inspection.<br>**Tradeoff**: Slightly more complex API, but critical for enterprise security compliance. |
 | **Generic `useCommunityJoinQueue` Hook** | Inline Screen Mutations | **Justification**: Extracted standard community join/leave queue/optimistic logic into a shared [useCommunityJoinQueue](file:///Users/kuldeep/kuldeep/communityHub/src/hooks/useCommunityJoinQueue.ts) hook. Both details and list views now use a unified path for joining.<br>**Tradeoff**: Slight abstraction, but guarantees identical offline/online sync logic across the app. |
 
 ---
@@ -246,6 +247,6 @@ yarn lint
 If given additional timeline, the following architecture upgrades would be implemented:
 1.  **Background Sync Engine**: Integrate `react-native-background-fetch` or work manager queues to replay the offline sync queue even when the app is backgrounded or terminated.
 2.  **Comprehensive Component Testing**: Set up `@testing-library/react-native` tests for core custom hooks (`useScreenName.ts` hooks), utilizing `msw` (Mock Service Worker) to mock API responses at the network layer.
-3.  **Secure Storage**: Migrate authentication token persistence from standard `AsyncStorage` to a keychain wrapper (like `react-native-keychain`) to secure authentication tokens.
+3.  **Encrypted Database**: Upgrade local state persistence (Zustand queues/cache) to use SQLCipher or MMKV with encryption keys retrieved from `react-native-keychain` to secure offline queues.
 4.  **Auto-generated API SDK**: Generate TypeScript axios instances directly from an OpenAPI/Swagger definition using `openapi-typescript-codegen` to guarantee strict API contracts between frontend and backend.
 5.  **CI/CD Pipeline**: Integrate GitHub Actions with Fastlane to automate builds, trigger TypeScript validation, run tests, and publish staging builds directly to TestFlight and Play Store internal tracks.

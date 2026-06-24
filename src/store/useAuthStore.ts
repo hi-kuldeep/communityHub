@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 
 export const useAuthStore = create<IAuthState>((set, get) => ({
   token: null,
@@ -15,7 +16,7 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
       avatar: user.avatar || user.profilePicture,
     };
     try {
-      await AsyncStorage.setItem('auth-token', token);
+      await Keychain.setGenericPassword('auth-token', token);
       await AsyncStorage.setItem('auth-user', JSON.stringify(normalizedUser));
       await AsyncStorage.setItem('auth-expires-at', expiresAt.toString());
       set({ token, user: normalizedUser, expiresAt, isAuthenticated: true });
@@ -26,7 +27,7 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
 
   logout: async () => {
     try {
-      await AsyncStorage.removeItem('auth-token');
+      await Keychain.resetGenericPassword();
       await AsyncStorage.removeItem('auth-user');
       await AsyncStorage.removeItem('auth-expires-at');
       set({ token: null, user: null, expiresAt: null, isAuthenticated: false });
@@ -38,11 +39,12 @@ export const useAuthStore = create<IAuthState>((set, get) => ({
   restoreSession: async () => {
     set({ isRestoring: true });
     try {
-      const token = await AsyncStorage.getItem('auth-token');
+      const credentials = await Keychain.getGenericPassword();
       const userStr = await AsyncStorage.getItem('auth-user');
       const expiresAtStr = await AsyncStorage.getItem('auth-expires-at');
 
-      if (token && userStr && expiresAtStr) {
+      if (credentials && userStr && expiresAtStr) {
+        const token = credentials.password;
         const expiresAt = parseInt(expiresAtStr, 10);
 
         // Enforce session timeout on launch if token has expired
