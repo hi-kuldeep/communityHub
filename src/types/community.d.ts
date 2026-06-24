@@ -4,6 +4,7 @@ interface ICommunity {
   description: string;
   memberCount: number;
   joined: boolean;
+  postCount: number;
 }
 
 type SORT_OPTIONS = 'name_asc' | 'name_desc' | 'members_desc';

@@ -4,6 +4,8 @@ import { Platform } from 'react-native';
 import { showModal } from '@/components/modalProvider/ModalProvider';
 import i18n from '@/localization';
 
+import { useAuthStore } from '@/store/useAuthStore';
+
 // Resolve mock server port in dev mode, staging/prod URL in release mode
 const baseURL = __DEV__
   ? Platform.select({
@@ -22,15 +24,20 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(config => {
   config.headers['Accept-Language'] = i18n.language;
-  // Add Authorization header if token exists
-  const token = '';
+  
+  // Resolve current authenticated user state dynamically from Zustand
+  const authState = useAuthStore.getState();
+  const token = authState.token;
+  const userId = authState.user?.id;
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  if (userId) {
+    config.headers['x-user-id'] = userId;
+  }
 
   return config;
-  // Helper to get user token from AuthContext
-  // You need to implement getUserToken in AuthContext to return the current user's token
 });
 
 // Add a response interceptor

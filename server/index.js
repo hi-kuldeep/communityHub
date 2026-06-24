@@ -17,7 +17,7 @@ const readDatabase = () => {
     return JSON.parse(data);
   } catch (error) {
     console.error('Error reading db.json:', error);
-    return { communities: [], posts: [] };
+    return { users: [], communities: [], memberships: [], posts: [] };
   }
 };
 
@@ -31,6 +31,39 @@ const writeDatabase = (data) => {
 };
 
 /**
+ * Helper to resolve the authenticated userId from request headers
+ * and dynamically register them in db.json if they don't exist yet.
+ */
+const getUserIdAndUpsert = (req, db) => {
+  const userId = req.headers['x-user-id'] || 'usr_test';
+  
+  db.users = db.users || [];
+  let user = db.users.find((u) => u.id === userId);
+  
+  if (!user) {
+    const cleanName = userId.includes('@') 
+      ? userId.split('@')[0] 
+      : userId.startsWith('usr_') 
+        ? `User_${userId.slice(4, 8)}` 
+        : userId;
+        
+    user = {
+      id: userId,
+      name: cleanName,
+      email: userId.includes('@') ? userId : `${userId}@example.com`,
+      avatar: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 9)}.jpg`,
+      location: 'Dubai',
+    };
+    
+    db.users.push(user);
+    writeDatabase(db);
+    console.log(`[Mock Server] Dynamic registration of active user: ${userId}`);
+  }
+  
+  return userId;
+};
+
+/**
  * GET /communities
  * Query Parameters:
  *  - search: string (matches name or description case-insensitively)
@@ -40,7 +73,27 @@ const writeDatabase = (data) => {
  */
 app.get('/communities', (req, res) => {
   const db = readDatabase();
-  let communities = [...(db.communities || [])];
+  const userId = getUserIdAndUpsert(req, db);
+  
+  let communities = (db.communities || []).map((c) => {
+    // 1. Dynamically calculate joined status from memberships table for this specific user
+    const isJoined = (db.memberships || []).some(
+      (m) => m.userId === userId && m.communityId === c.id
+    );
+    // 2. Dynamically calculate genuine memberCount (strictly count matching records in memberships table)
+    const finalMemberCount = (db.memberships || []).filter(
+      (m) => m.communityId === c.id
+    ).length;
+    // 3. Dynamically calculate genuine postCount (posts table count matching this communityId)
+    const postCount = (db.posts || []).filter((p) => p.communityId === c.id).length;
+
+    return {
+      ...c,
+      joined: isJoined,
+      memberCount: finalMemberCount,
+      postCount: postCount,
+    };
+  });
 
   // 1. Search Filter
   const search = (req.query.search || '').toString().trim().toLowerCase();
@@ -87,28 +140,63 @@ app.get('/communities', (req, res) => {
 
 /**
  * PATCH /communities/:id
- * Updates specific fields in a community item (used for joining/leaving and updating member counts)
+ * Toggles a community joined status statefully for this specific user by updating the memberships table
  */
 app.patch('/communities/:id', (req, res) => {
   const db = readDatabase();
   const id = req.params.id;
+  const userId = getUserIdAndUpsert(req, db);
   const communities = db.communities || [];
+  const memberships = db.memberships || [];
 
   const communityIndex = communities.findIndex((c) => c.id === id);
   if (communityIndex === -1) {
     return res.status(404).json({ message: `Community with ID ${id} not found.` });
   }
 
-  // Update provided fields statefully
+  const community = communities[communityIndex];
+
+  // Handle joined toggle dynamically inside memberships intermediate table for the user
+  if (req.body.joined !== undefined) {
+    const isJoined = req.body.joined;
+    const membershipIndex = memberships.findIndex(
+      (m) => m.userId === userId && m.communityId === id
+    );
+
+    if (isJoined && membershipIndex === -1) {
+      // Add membership link
+      memberships.push({ userId, communityId: id });
+    } else if (!isJoined && membershipIndex !== -1) {
+      // Remove membership link
+      memberships.splice(membershipIndex, 1);
+    }
+  }
+
+  // Update other community attributes if passed
+  const { joined, ...otherProps } = req.body;
   const updatedCommunity = {
-    ...communities[communityIndex],
-    ...req.body,
+    ...community,
+    ...otherProps,
   };
 
   communities[communityIndex] = updatedCommunity;
-  writeDatabase({ ...db, communities });
+  writeDatabase({ ...db, communities, memberships });
 
-  return res.json(updatedCommunity);
+  // Dynamically calculate values for response
+  const finalMemberCount = memberships.filter(
+    (m) => m.communityId === id
+  ).length;
+  const postCount = (db.posts || []).filter((p) => p.communityId === id).length;
+
+  // Calculate and return updated community object with dynamic attributes
+  return res.json({
+    ...updatedCommunity,
+    joined: memberships.some(
+      (m) => m.userId === userId && m.communityId === id
+    ),
+    memberCount: finalMemberCount,
+    postCount: postCount,
+  });
 });
 
 /**
@@ -125,15 +213,39 @@ app.get('/posts', (req, res) => {
   }
 
   const posts = (db.posts || []).filter((p) => p.communityId === communityId);
-  return res.json(posts);
+
+  // Map each post to include corresponding author details from users table
+  const populatedPosts = posts.map((post) => {
+    let author = (db.users || []).find((u) => u.id === post.authorId);
+    if (!author) {
+      author = {
+        id: post.authorId,
+        name: `User_${post.authorId.slice(4, 8)}`,
+        email: `${post.authorId}@example.com`,
+        avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
+      };
+    }
+    return {
+      ...post,
+      author: {
+        id: author.id,
+        name: author.name,
+        email: author.email,
+        avatar: author.avatar,
+      },
+    };
+  });
+
+  return res.json(populatedPosts);
 });
 
 /**
  * POST /posts
- * Adds a new post to the community
+ * Adds a new post to the community with author relation resolving to current user
  */
 app.post('/posts', (req, res) => {
   const db = readDatabase();
+  const userId = getUserIdAndUpsert(req, db);
   const { communityId, title, body } = req.body;
 
   if (!communityId || !title || !body) {
@@ -143,6 +255,7 @@ app.post('/posts', (req, res) => {
   const newPost = {
     id: `post-${Date.now()}`,
     communityId,
+    authorId: userId,
     title,
     body,
     createdAt: new Date().toISOString(),
@@ -152,9 +265,20 @@ app.post('/posts', (req, res) => {
   posts.push(newPost);
   writeDatabase({ ...db, posts });
 
-  return res.status(201).json(newPost);
+  const author = (db.users || []).find((u) => u.id === userId);
+  const populatedPost = {
+    ...newPost,
+    author: author ? {
+      id: author.id,
+      name: author.name,
+      email: author.email,
+      avatar: author.avatar,
+    } : null,
+  };
+
+  return res.status(201).json(populatedPost);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[Mock Server] Custom mock server is running on http://localhost:${PORT}`);
+  console.log(`[Mock Server] Relational multi-user mock server is running on http://localhost:${PORT}`);
 });
