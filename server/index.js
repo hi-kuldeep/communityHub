@@ -253,11 +253,9 @@ app.post('/posts', (req, res) => {
   const { communityId, title, body } = req.body;
 
   if (!communityId || !title || !body) {
-    return res
-      .status(400)
-      .json({
-        message: 'Missing required fields: communityId, title, or body',
-      });
+    return res.status(400).json({
+      message: 'Missing required fields: communityId, title, or body',
+    });
   }
 
   const newPost = {
@@ -316,14 +314,18 @@ app.post('/users/login', (req, res) => {
   } else {
     // If the user exists, validate their password only if they have a password field configured in the database
     if (user.password && password !== user.password) {
-      console.log(`[Mock Server] Incorrect password attempt for user: ${email}`);
-      return res.status(401).json({ message: 'Incorrect password. Please try again.' });
+      console.log(
+        `[Mock Server] Incorrect password attempt for user: ${email}`,
+      );
+      return res
+        .status(401)
+        .json({ message: 'Incorrect password. Please try again.' });
     }
   }
 
   const token = `fake_jwt_token_${Date.now()}`;
-  // const expiresAt = Date.now() + 3600 * 1000; // Token valid for 1 hour
-  const expiresAt = Date.now() + 30 * 1000; // Token valid for 30 seconds
+  const expiresAt = Date.now() + 3600 * 1000; // Token valid for 1 hour
+  // const expiresAt = Date.now() + 30 * 1000; // Token valid for 30 seconds
 
   return res.json({
     token,
