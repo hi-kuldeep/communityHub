@@ -1,11 +1,10 @@
 import React from 'react';
 import { Platform, View, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Home, Users, User } from 'lucide-react-native';
+import { Users, User } from 'lucide-react-native';
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import TabHeader from '@/components/TabHeader';
-import MainScreen from '@/screens/main';
 import CommunityList from '@/screens/communityList';
 import ProfileScreen from '@/screens/profile';
 import { bottomTabStackParam } from './bottomTabStackParam';
@@ -20,8 +19,6 @@ const BottomTabNavigator = () => {
 
   const getHeaderTitle = (routeName: string) => {
     switch (routeName) {
-      case bottomTabStackName.HOME:
-        return 'Home';
       case bottomTabStackName.COMMUNITIES:
         return 'Groups';
       case bottomTabStackName.PROFILE:
@@ -60,25 +57,6 @@ const BottomTabNavigator = () => {
         },
       })}
     >
-      <Tab.Screen
-        name={bottomTabStackName.HOME}
-        component={MainScreen}
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <View style={styles.tabIconContainer}>
-              <Home size={22} color={color} />
-              {focused && (
-                <View
-                  style={[
-                    styles.activeDot,
-                    { backgroundColor: colors.primary },
-                  ]}
-                />
-              )}
-            </View>
-          ),
-        }}
-      />
       <Tab.Screen
         name={bottomTabStackName.COMMUNITIES}
         component={CommunityList}
