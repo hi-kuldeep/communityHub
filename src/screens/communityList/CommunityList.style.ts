@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { spacing } from '@/theme/spacing';
+import { IS_IOS } from '@/constants/deviceInfo';
 
 const styles = StyleSheet.create({
   container: {
@@ -8,7 +9,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
+    paddingTop: IS_IOS ? spacing.xl : 0,
   },
   listContainer: {
     paddingBottom: spacing.xxl + 40, // Space for floating tab bar bottom padding

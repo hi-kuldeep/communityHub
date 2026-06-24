@@ -92,7 +92,6 @@ const CommunityList = () => {
         </View>
       );
     }
-    console.log('communities', communities);
 
     return (
       <FlashList
