@@ -41,6 +41,12 @@ The API and database server are hosted in a separate Git repository:
 - **Backend Repo**: [hi-kuldeep/community-hub-backend](https://github.com/hi-kuldeep/community-hub-backend)
   Please follow the instructions in the backend repository to set up and run the server before launching this mobile application.
 
+> [!NOTE]
+> **Render Free Tier Server Spin-Up (Cold Starts)**:
+> The hosted backend API is deployed on Render's free tier (`https://community-hub-backend-hgxl.onrender.com/`). Render automatically spins down (puts to sleep) free containers after 15 minutes of inactivity. 
+> - **How to wake it up**: If the mobile application displays connection errors or fails to load data initially, open the API URL [https://community-hub-backend-hgxl.onrender.com/](https://community-hub-backend-hgxl.onrender.com/) in your web browser, or run `curl https://community-hub-backend-hgxl.onrender.com/` in your terminal.
+> - **Spin-up time**: It usually takes **50 to 90 seconds** for the Render instance to spin back up and resume responding. Once it loads successfully in your browser, the mobile app will function normally.
+
 ### 🔑 Demo Credentials
 
 To login and test the application, use one of the following mock accounts:
