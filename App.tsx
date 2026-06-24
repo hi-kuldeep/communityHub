@@ -14,7 +14,6 @@ import RootStackNavigator from '@/navigation/rootStackNavigator/RootStackNavigat
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import ModalProvider from '@/components/modalProvider/ModalProvider';
-import { Host } from 'react-native-portalize';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useNetworkListener from '@/hooks/useNetworkListener';
 import useOfflineQueueSync from '@/hooks/useOfflineQueueSync';
@@ -73,25 +72,23 @@ function App(): React.JSX.Element {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Host>
-        <SafeAreaProvider>
-          <QueryClientProvider client={queryClient}>
-            <ErrorBoundary>
-              <NavigationContainer theme={navigationTheme}>
-                <StatusBar
-                  barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-                  backgroundColor={colors.background}
-                />
-                <ModalProvider>
-                  <RootStackNavigator />
-                </ModalProvider>
-                {/* Global offline banner — rendered above all navigation content */}
-                <OfflineBanner />
-              </NavigationContainer>
-            </ErrorBoundary>
-          </QueryClientProvider>
-        </SafeAreaProvider>
-      </Host>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <ErrorBoundary>
+            <NavigationContainer theme={navigationTheme}>
+              <StatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                backgroundColor={colors.background}
+              />
+              <ModalProvider>
+                <RootStackNavigator />
+              </ModalProvider>
+              {/* Global offline banner — rendered above all navigation content */}
+              <OfflineBanner />
+            </NavigationContainer>
+          </ErrorBoundary>
+        </QueryClientProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
