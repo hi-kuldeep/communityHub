@@ -6,4 +6,16 @@ import axiosInstance from '@/services/api/axiosInstance';
 const fetchCommunityPosts = async (communityId: string): Promise<IPost[]> =>
   axiosInstance.get('/posts', { params: { communityId } }).then(res => res?.data);
 
-export { fetchCommunityPosts };
+/**
+ * Creates a new post in a community.
+ */
+const createPost = async (
+  communityId: string,
+  title: string,
+  body: string,
+): Promise<IPost> =>
+  axiosInstance
+    .post('/posts', { communityId, title, body })
+    .then(res => res?.data);
+
+export { fetchCommunityPosts, createPost };

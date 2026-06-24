@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCommunityDetails, toggleCommunityJoin } from '@/services/api/communityService';
-import { fetchCommunityPosts } from '@/services/api/postService';
+import { fetchCommunityPosts, createPost } from '@/services/api/postService';
 import { rootStackParams } from '@/navigation/rootStackNavigator/rootStackParams';
 import { rootStackName } from '@/navigation/rootStackNavigator/rootStackName';
 
@@ -99,7 +99,71 @@ export const useCommunityDetails = () => {
     navigation.goBack();
   }, [navigation]);
 
+  // 7. Retry failed optimistic post
+  const retryMutation = useMutation({
+    mutationFn: ({
+      postId,
+      title,
+      body,
+    }: {
+      postId: string;
+      title: string;
+      body: string;
+    }) => createPost(communityId, title, body),
+    onMutate: async ({ postId }) => {
+      await queryClient.cancelQueries({ queryKey: ['communityPosts', communityId] });
+      queryClient.setQueryData<any[]>(['communityPosts', communityId], (old) => {
+        if (!old) return [];
+        return old.map((post) =>
+          post.id === postId ? { ...post, isPending: true, isFailed: false } : post
+        );
+      });
+      queryClient.setQueryData<ICommunity>(['communityDetails', communityId], (old) => {
+        if (!old) return old;
+        return { ...old, postCount: old.postCount + 1 };
+      });
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData<any[]>(['communityPosts', communityId], (old) => {
+        if (!old) return [];
+        return old.map((post) =>
+          post.id === variables.postId ? data : post
+        );
+      });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+      queryClient.invalidateQueries({ queryKey: ['communityDetails', communityId] });
+    },
+    onError: (error, variables) => {
+      console.error('Retry post creation failed:', error);
+      queryClient.setQueryData<any[]>(['communityPosts', communityId], (old) => {
+        if (!old) return [];
+        return old.map((post) =>
+          post.id === variables.postId
+            ? { ...post, isPending: false, isFailed: true }
+            : post
+        );
+      });
+      queryClient.setQueryData<ICommunity>(['communityDetails', communityId], (old) => {
+        if (!old) return old;
+        return { ...old, postCount: Math.max(0, old.postCount - 1) };
+      });
+    },
+  });
+
+  const handleRetryPost = useCallback(
+    (post: any) => {
+      if (!post.isFailed) return;
+      retryMutation.mutate({
+        postId: post.id,
+        title: post.title,
+        body: post.body,
+      });
+    },
+    [retryMutation]
+  );
+
   return {
+    communityId,
     community: detailsQuery.data,
     posts: postsQuery.data || [],
     isDetailsLoading: detailsQuery.isPending,
@@ -111,6 +175,7 @@ export const useCommunityDetails = () => {
     onRefresh,
     handleToggleJoin,
     handleGoBack,
+    handleRetryPost,
     refetchDetails: detailsQuery.refetch,
     refetchPosts: postsQuery.refetch,
   };

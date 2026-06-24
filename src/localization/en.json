@@ -48,6 +48,21 @@
     "noPosts": "No posts in this community yet.",
     "about": "About",
     "loadError": "Could not load community details.",
-    "postsLoadError": "Could not load posts."
+    "postsLoadError": "Could not load posts.",
+    "notMember": "Please join the community to create posts."
+  },
+  "createPost": {
+    "title": "Create Post",
+    "postButton": "Post",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Enter post title...",
+    "bodyLabel": "Body",
+    "bodyPlaceholder": "Write your post content here...",
+    "submitting": "Posting...",
+    "validationTitleRequired": "Title is required",
+    "validationBodyRequired": "Body is required",
+    "validationBodyMin": "Body must be at least 10 characters",
+    "failedMessage": "Failed to send. Tap to retry.",
+    "fabLabel": "Create new post"
   }
 }

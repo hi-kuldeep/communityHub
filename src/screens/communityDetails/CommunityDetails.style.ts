@@ -95,6 +95,21 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     minWidth: 100,
   },
+  fab: {
+    position: 'absolute',
+    right: spacing.lg,
+    bottom: spacing.xl + spacing.lg,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
 });
 
 export default styles;

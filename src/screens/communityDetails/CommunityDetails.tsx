@@ -2,7 +2,9 @@ import React from 'react';
 import { View, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react-native';
+import { Plus } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import Container from '@/components/container/Container';
 import CustomText from '@/components/CustomText';
@@ -14,17 +16,23 @@ import RefreshControlComponent from '@/components/refreshControlComponent/Refres
 
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
+import { rootStackName } from '@/navigation/rootStackNavigator/rootStackName';
+import { rootStackParams } from '@/navigation/rootStackNavigator/rootStackParams';
 import useCommunityDetails from './useCommunityDetails';
 import PostCard from './components/PostCard';
 import styles from './CommunityDetails.style';
+import { showModal } from '@/components/modalProvider/ModalProvider';
 
 const CommunityDetails = () => {
   const { t } = useTranslation();
   const { themeMode } = useThemeStore();
   const colors = getColors(themeMode);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<rootStackParams>>();
 
   const {
     community,
+    communityId,
     posts,
     isDetailsLoading,
     isDetailsError,
@@ -35,13 +43,26 @@ const CommunityDetails = () => {
     onRefresh,
     handleToggleJoin,
     handleGoBack,
+    handleRetryPost,
     refetchDetails,
     refetchPosts,
   } = useCommunityDetails();
 
+  const handleNavigateToCreatePost = React.useCallback(() => {
+    if (!community?.joined) {
+      return showModal({
+        message: t('communityDetails.notMember'),
+        successTitle: t('common.ok'),
+      });
+    }
+    navigation.navigate(rootStackName.CREATE_POST, { communityId });
+  }, [navigation, communityId, community?.joined]);
+
   const renderPostItem = React.useCallback(
-    ({ item }: { item: IPost }) => <PostCard item={item} />,
-    [],
+    ({ item }: { item: IPost }) => (
+      <PostCard item={item} onPressRetry={handleRetryPost} />
+    ),
+    [handleRetryPost],
   );
 
   const renderHeaderComponent = () => {
@@ -218,6 +239,17 @@ const CommunityDetails = () => {
       containerStyle={styles.container}
     >
       {renderContent()}
+
+      {/* Floating Action Button – Create Post */}
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={handleNavigateToCreatePost}
+        activeOpacity={0.85}
+        accessibilityLabel={t('createPost.fabLabel')}
+        accessibilityRole="button"
+      >
+        <Plus size={28} color="#ffffff" strokeWidth={2.5} />
+      </TouchableOpacity>
     </Container>
   );
 };

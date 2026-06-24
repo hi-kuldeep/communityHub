@@ -15,10 +15,13 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import CommunityDetails from '@/screens/communityDetails/CommunityDetails';
 import ScreenHeader from '@/components/ScreenHeader';
+import CreatePost from '@/screens/createPost/CreatePost';
+import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator<rootStackParams>();
 
 const RootStackNavigator: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, isRestoring, restoreSession } = useAuthStore();
   const { themeMode } = useThemeStore();
   const colors = getColors(themeMode);
@@ -75,6 +78,14 @@ const RootStackNavigator: React.FC = () => {
         component={CommunityDetails}
         options={{
           header: () => <ScreenHeader title="" />,
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen
+        name={rootStackName.CREATE_POST}
+        component={CreatePost}
+        options={{
+          header: () => <ScreenHeader title={t('createPost.title')} />,
           headerShown: true,
         }}
       />

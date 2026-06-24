@@ -87,6 +87,12 @@ const CustomInput = forwardRef<TextInput, CustomInputProps>(
               borderColor: inputBorderColor,
               backgroundColor: colors.surface,
             },
+            rest.multiline && {
+              height: undefined,
+              minHeight: 120,
+              alignItems: 'flex-start',
+              paddingVertical: spacing.sm,
+            },
           ]}
         >
           {leftIcon && <View style={styles.leftIconWrapper}>{leftIcon}</View>}
@@ -96,6 +102,9 @@ const CustomInput = forwardRef<TextInput, CustomInputProps>(
               styles.input,
               {
                 color: colors.text,
+              },
+              rest.multiline && {
+                textAlignVertical: 'top',
               },
               inputStyle,
             ]}
