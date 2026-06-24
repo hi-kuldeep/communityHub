@@ -4,6 +4,8 @@
     "error": "Something went wrong",
     "retry": "Retry",
     "offline": "You are currently offline",
+    "offlineMessage": "No internet connection. Changes will sync when you're back online.",
+    "backOnline": "You're back online!",
     "back": "Back",
     "cancel": "Cancel",
     "ok": "OK",

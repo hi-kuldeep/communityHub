@@ -16,11 +16,23 @@ import { getColors } from '@/theme/colors';
 import ModalProvider from '@/components/modalProvider/ModalProvider';
 import { Host } from 'react-native-portalize';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import useNetworkListener from '@/hooks/useNetworkListener';
+import OfflineBanner from '@/components/OfflineBanner';
+import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
+// Configure once during app startup
+NetInfo.configure({
+  reachabilityUrl: 'https://www.google.com',
+  reachabilityTest: async response => response.ok,
+  reachabilityShortTimeout: 5000,
+  reachabilityLongTimeout: 30000,
+});
 function App(): React.JSX.Element {
   const { themeMode } = useThemeStore();
   const colors = getColors(themeMode);
   const isDarkMode = themeMode === 'dark';
+
+  // Start global NetInfo listener — syncs to useNetworkStore
+  useNetworkListener();
 
   const baseTheme = isDarkMode ? DarkTheme : DefaultTheme;
 
@@ -51,6 +63,8 @@ function App(): React.JSX.Element {
               <ModalProvider>
                 <RootStackNavigator />
               </ModalProvider>
+              {/* Global offline banner — rendered above all navigation content */}
+              <OfflineBanner />
             </NavigationContainer>
           </QueryClientProvider>
         </SafeAreaProvider>

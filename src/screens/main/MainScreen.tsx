@@ -6,6 +6,7 @@ import CustomButton from '@/components/CustomButton';
 import ThemeToggle from '@/components/ThemeToggle';
 import useMainScreen from './useMainScreen';
 import styles from './MainScreen.style';
+import NetInfo from '@react-native-community/netinfo';
 
 const MainScreen = () => {
   const { user, loading, handleLogout } = useMainScreen();
@@ -20,7 +21,11 @@ const MainScreen = () => {
         Welcome Back!
       </CustomText>
 
-      <CustomText preset="bodyLarge" color="textSecondary" style={styles.subtitle}>
+      <CustomText
+        preset="bodyLarge"
+        color="textSecondary"
+        style={styles.subtitle}
+      >
         Logged in as: {user?.email || 'Guest User'}
       </CustomText>
 
@@ -31,6 +36,21 @@ const MainScreen = () => {
         style={styles.button}
       >
         Logout
+      </CustomButton>
+
+      <CustomButton
+        mode="filled"
+        loading={loading}
+        onPress={async () => {
+          await NetInfo.refresh();
+
+          NetInfo.fetch().then(state => {
+            console.log('MANUAL FETCH:', state);
+          });
+        }}
+        style={styles.button}
+      >
+        Check Network
       </CustomButton>
     </Container>
   );
