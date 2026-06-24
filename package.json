@@ -6,7 +6,6 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
-    "mock-server": "node server/index.js",
     "start": "node scripts/start.js",
     "test": "jest"
   },
