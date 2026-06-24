@@ -305,6 +305,10 @@
     {
       "userId": "usr_emily",
       "communityId": "22"
+    },
+    {
+      "userId": "usr_test",
+      "communityId": "2"
     }
   ],
   "posts": [

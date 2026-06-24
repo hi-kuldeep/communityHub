@@ -143,6 +143,41 @@ app.get('/communities', (req, res) => {
 });
 
 /**
+ * GET /communities/:id
+ * Retrieves detailed info for a single community
+ */
+app.get('/communities/:id', (req, res) => {
+  const db = readDatabase();
+  const id = req.params.id;
+  const userId = getUserIdAndUpsert(req, db);
+
+  const community = (db.communities || []).find(c => c.id === id);
+  if (!community) {
+    return res
+      .status(404)
+      .json({ message: `Community with ID ${id} not found.` });
+  }
+
+  // Calculate stats and membership status dynamically
+  const isJoined = (db.memberships || []).some(
+    m => m.userId === userId && m.communityId === id,
+  );
+  const finalMemberCount = (db.memberships || []).filter(
+    m => m.communityId === id,
+  ).length;
+  const postCount = (db.posts || []).filter(
+    p => p.communityId === id,
+  ).length;
+
+  return res.json({
+    ...community,
+    joined: isJoined,
+    memberCount: finalMemberCount,
+    postCount: postCount,
+  });
+});
+
+/**
  * PATCH /communities/:id
  * Toggles a community joined status statefully for this specific user by updating the memberships table
  */

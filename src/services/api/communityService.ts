@@ -9,4 +9,19 @@ const fetchCommunities = async (
 ): Promise<IPagination<ICommunity>> =>
   axiosInstance.get('/communities', { params }).then(res => res?.data);
 
-export { fetchCommunities };
+/**
+ * Fetches details for a single community.
+ */
+const fetchCommunityDetails = async (id: string): Promise<ICommunity> =>
+  axiosInstance.get(`/communities/${id}`).then(res => res?.data);
+
+/**
+ * Joins or leaves a community.
+ */
+const toggleCommunityJoin = async (
+  id: string,
+  joined: boolean,
+): Promise<ICommunity> =>
+  axiosInstance.patch(`/communities/${id}`, { joined }).then(res => res?.data);
+
+export { fetchCommunities, fetchCommunityDetails, toggleCommunityJoin };
