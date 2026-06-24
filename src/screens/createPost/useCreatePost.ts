@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as Yup from 'yup';
@@ -20,10 +20,11 @@ export const useCreatePost = () => {
 
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
-  const { getDraft, saveDraft, clearDraft } = useDraftStore();
+  const drafts = useDraftStore(state => state.drafts);
+  const { saveDraft, clearDraft } = useDraftStore();
 
   // Load unsent draft for this community on mount
-  const draft = useMemo(() => getDraft(communityId), [communityId, getDraft]);
+  const draft = useMemo(() => drafts[communityId] || { title: '', body: '' }, [drafts, communityId]);
 
   const postSchema = useMemo(() => {
     return Yup.object().shape({
@@ -85,11 +86,12 @@ export const useCreatePost = () => {
 
   const form = useForm({
     initialValues: {
-      title: draft.title,
-      body: draft.body,
+      title: '',
+      body: '',
     },
     validationSchema: postSchema,
     onSubmit: values => {
+      if (submitMutation.isPending) return;
       const optimisticId = `optimistic-${Date.now()}`;
 
       const optimisticPost = {
@@ -138,6 +140,20 @@ export const useCreatePost = () => {
       navigation.goBack();
     },
   });
+
+  // Restore draft once on mount or when the draft store hydrates
+  const hasRestored = useRef(false);
+  useEffect(() => {
+    if (!hasRestored.current && draft) {
+      if (draft.title || draft.body) {
+        form.setValues({
+          title: draft.title,
+          body: draft.body,
+        });
+      }
+      hasRestored.current = true;
+    }
+  }, [draft, form]);
 
   // Auto-save draft on form input changes
   const { title, body } = form.values;

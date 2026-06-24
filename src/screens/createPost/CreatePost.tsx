@@ -45,6 +45,7 @@ const CreatePost = () => {
         <CustomButton
           mode="filled"
           loading={isSubmitting}
+          disabled={isSubmitting}
           onPress={form.handleSubmit}
           style={styles.submitButton}
         >

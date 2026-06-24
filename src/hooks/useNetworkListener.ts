@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { useNetworkStore } from '@/store/useNetworkStore';
 
@@ -24,20 +25,35 @@ const useNetworkListener = () => {
     ) => isConnected === true && isInternetReachable !== false;
 
     // Fetch initial connectivity state immediately on mount
-    NetInfo.fetch().then(state => {
-      console.log('FETCH:', state);
-      setOnline(resolveOnline(state.isConnected, state.isInternetReachable));
-    });
+    const fetchStatus = () => {
+      NetInfo.fetch().then(state => {
+        console.log('FETCH:', state);
+        setOnline(resolveOnline(state.isConnected, state.isInternetReachable));
+      });
+    };
+
+    fetchStatus();
 
     // Subscribe to future changes
     const unsubscribe = NetInfo.addEventListener(state => {
-      console.log(state);
-
+      console.log('NET INFO CHANGE:', state);
       setOnline(resolveOnline(state.isConnected, state.isInternetReachable));
     });
 
-    return () => unsubscribe();
-  }, []);
+    // Re-check status when app becomes active (returns to foreground)
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        fetchStatus();
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+    return () => {
+      unsubscribe();
+      subscription.remove();
+    };
+  }, [setOnline]);
 };
 
 export default useNetworkListener;

@@ -8,7 +8,7 @@ import {
   DefaultTheme,
   DarkTheme,
 } from '@react-navigation/native';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider, onlineManager } from '@tanstack/react-query';
 import { queryClient } from '@/services/queryClient';
 import RootStackNavigator from '@/navigation/rootStackNavigator/RootStackNavigator';
 import { useThemeStore } from '@/store/useThemeStore';
@@ -17,8 +17,11 @@ import ModalProvider from '@/components/modalProvider/ModalProvider';
 import { Host } from 'react-native-portalize';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import useNetworkListener from '@/hooks/useNetworkListener';
+import useOfflineQueueSync from '@/hooks/useOfflineQueueSync';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import OfflineBanner from '@/components/OfflineBanner';
-import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
+import NetInfo from '@react-native-community/netinfo';
+
 // Configure once during app startup
 NetInfo.configure({
   reachabilityUrl: 'https://www.google.com',
@@ -26,6 +29,15 @@ NetInfo.configure({
   reachabilityShortTimeout: 5000,
   reachabilityLongTimeout: 30000,
 });
+
+// Hook up TanStack Query's onlineManager to NetInfo
+onlineManager.setEventListener(setOnline => {
+  return NetInfo.addEventListener(state => {
+    const isOnline = state.isConnected === true && state.isInternetReachable !== false;
+    setOnline(isOnline);
+  });
+});
+
 function App(): React.JSX.Element {
   const { themeMode } = useThemeStore();
   const colors = getColors(themeMode);
@@ -33,6 +45,9 @@ function App(): React.JSX.Element {
 
   // Start global NetInfo listener — syncs to useNetworkStore
   useNetworkListener();
+
+  // Start background queue synchronization listener
+  useOfflineQueueSync();
 
   const baseTheme = isDarkMode ? DarkTheme : DefaultTheme;
 
@@ -55,17 +70,19 @@ function App(): React.JSX.Element {
       <Host>
         <SafeAreaProvider>
           <QueryClientProvider client={queryClient}>
-            <NavigationContainer theme={navigationTheme}>
-              <StatusBar
-                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-                backgroundColor={colors.background}
-              />
-              <ModalProvider>
-                <RootStackNavigator />
-              </ModalProvider>
-              {/* Global offline banner — rendered above all navigation content */}
-              <OfflineBanner />
-            </NavigationContainer>
+            <ErrorBoundary>
+              <NavigationContainer theme={navigationTheme}>
+                <StatusBar
+                  barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                  backgroundColor={colors.background}
+                />
+                <ModalProvider>
+                  <RootStackNavigator />
+                </ModalProvider>
+                {/* Global offline banner — rendered above all navigation content */}
+                <OfflineBanner />
+              </NavigationContainer>
+            </ErrorBoundary>
           </QueryClientProvider>
         </SafeAreaProvider>
       </Host>

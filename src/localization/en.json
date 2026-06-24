@@ -10,7 +10,9 @@
     "cancel": "Cancel",
     "ok": "OK",
     "noDataFound": "No Data Found",
-    "pleaseWait": "Please wait..."
+    "pleaseWait": "Please wait...",
+    "unexpectedError": "An unexpected application error occurred.",
+    "resetApp": "Reset App"
   },
   "placeholder": {
     "title": "Community Hub",
@@ -51,7 +53,10 @@
     "about": "About",
     "loadError": "Could not load community details.",
     "postsLoadError": "Could not load posts.",
-    "notMember": "Please join the community to create posts."
+    "notMember": "Please join the community to create posts.",
+    "syncFailed": "Failed to sync your request to {{action}} the community. Please check your data.",
+    "offlineJoinQueued": "You are offline. We have queued your request to join this community. It will synchronize automatically when your connection is restored.",
+    "offlineLeaveQueued": "You are offline. We have queued your request to leave this community. It will synchronize automatically when your connection is restored."
   },
   "createPost": {
     "title": "Create Post",

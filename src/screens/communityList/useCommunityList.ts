@@ -4,6 +4,7 @@ import useInfinitePaginatedQuery from '@/hooks/usePaginatedQuery';
 import { fetchCommunities } from '@/services/api/communityService';
 import { rootStackName } from '@/navigation/rootStackNavigator/rootStackName';
 import { RootStackNavigationProp } from '@/navigation/types';
+import { useOfflineQueueStore } from '@/store/useOfflineQueueStore';
 
 export const useCommunityList = () => {
   const navigation = useNavigation<RootStackNavigationProp<any>>();
@@ -16,13 +17,25 @@ export const useCommunityList = () => {
     params: { sort },
   });
 
-  console.log({ data, query });
+  const queue = useOfflineQueueStore(state => state.queue);
 
-  // Flat-map pages to get a clean array of Community items
+  // Flat-map pages to get a clean array of Community items, merging with pending offline queue states
   const communities = useMemo(() => {
     if (!query.data?.pages) return [] as ICommunity[];
-    return query.data.pages.flatMap(page => page.data) as ICommunity[];
-  }, [query.data]);
+    const rawList = query.data.pages.flatMap(page => page.data) as ICommunity[];
+
+    return rawList.map(c => {
+      const queued = queue.find(item => item.communityId === c.id);
+      if (!queued) return c;
+      const isJoined = queued.action === 'join';
+      if (c.joined === isJoined) return c;
+      return {
+        ...c,
+        joined: isJoined,
+        memberCount: Math.max(0, c.memberCount + (isJoined ? 1 : -1)),
+      };
+    });
+  }, [query.data, queue]);
 
   // Handle pull-to-refresh
   const onRefresh = useCallback(async () => {
@@ -49,9 +62,12 @@ export const useCommunityList = () => {
   }, []);
 
   // Handle community card click navigation callback
-  const onPressCommunity = useCallback((id: string) => {
-    navigation.navigate(rootStackName.COMMUNITY_DETAILS, { communityId: id });
-  }, [navigation]);
+  const onPressCommunity = useCallback(
+    (id: string) => {
+      navigation.navigate(rootStackName.COMMUNITY_DETAILS, { communityId: id });
+    },
+    [navigation],
+  );
 
   // Derived loading / error states for granular feedback in the UI
   const isInitialLoading = query.isPending && !refreshing;
