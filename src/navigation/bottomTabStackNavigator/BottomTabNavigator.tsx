@@ -6,7 +6,7 @@ import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import TabHeader from '@/components/TabHeader';
 import MainScreen from '@/screens/main';
-import CommunitiesScreen from '@/screens/communities';
+import CommunityList from '@/screens/communityList';
 import ProfileScreen from '@/screens/profile';
 import { bottomTabStackParam } from './bottomTabStackParam';
 import { bottomTabStackName } from './bottomTabStackName';
@@ -81,7 +81,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name={bottomTabStackName.COMMUNITIES}
-        component={CommunitiesScreen}
+        component={CommunityList}
         options={{
           tabBarIcon: ({ color, focused }) => (
             <View style={styles.tabIconContainer}>

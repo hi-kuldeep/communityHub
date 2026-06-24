@@ -1,6 +1,7 @@
 import {
   useInfiniteQuery,
   UseInfiniteQueryResult,
+  InfiniteData,
 } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { useDebounce } from './useDebounce';
@@ -47,7 +48,7 @@ function useInfinitePaginatedQuery<
 
   const queryKey = [queryKeyBase, debouncedSearch, params];
 
-  const query: UseInfiniteQueryResult<AwaitedReturnType<TQueryFn>> =
+  const query: UseInfiniteQueryResult<InfiniteData<AwaitedReturnType<TQueryFn>>> =
     useInfiniteQuery({
       queryKey,
       queryFn: ({ pageParam = initialPage }) =>
@@ -57,9 +58,13 @@ function useInfinitePaginatedQuery<
           ...params,
           page: pageParam,
         }),
-      getNextPageParam: (lastPage, allPages) => {
+      getNextPageParam: (lastPage: any, allPages) => {
         if (getNextPageParam) {
           return getNextPageParam(lastPage, allPages);
+        }
+        // Check if the response contains a nextPage property directly (standard metadata response)
+        if (lastPage && typeof lastPage === 'object' && 'nextPage' in lastPage) {
+          return lastPage.nextPage;
         }
         // Default logic: if the last page has items, assume there's a next page
         if (

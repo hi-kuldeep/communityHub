@@ -29,6 +29,10 @@
     "noAccount": "Don't have an account? ",
     "signUp": "Sign up"
   },
+  "communityList": {
+    "searchPlaceholder": "Search communities...",
+    "noCommunitiesFound": "No communities match your search"
+  },
   "validation": {
     "emailRequired": "Email is required",
     "emailInvalid": "Please enter a valid email address",
