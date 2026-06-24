@@ -1,8 +1,12 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import useInfinitePaginatedQuery from '@/hooks/usePaginatedQuery';
 import { fetchCommunities } from '@/services/api/communityService';
+import { rootStackName } from '@/navigation/rootStackNavigator/rootStackName';
+import { RootStackNavigationProp } from '@/navigation/types';
 
 export const useCommunityList = () => {
+  const navigation = useNavigation<RootStackNavigationProp<any>>();
   const [sort, setSort] = useState<SORT_OPTIONS>('name_asc');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -46,8 +50,8 @@ export const useCommunityList = () => {
 
   // Handle community card click navigation callback
   const onPressCommunity = useCallback((id: string) => {
-    console.log('Navigate to community details:', id);
-  }, []);
+    navigation.navigate(rootStackName.COMMUNITY_DETAILS, { communityId: id });
+  }, [navigation]);
 
   // Derived loading / error states for granular feedback in the UI
   const isInitialLoading = query.isPending && !refreshing;

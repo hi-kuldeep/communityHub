@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Users, ChevronRight } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import CustomText from '@/components/CustomText';
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
@@ -12,6 +13,7 @@ interface CommunityCardProps {
 }
 
 const CommunityCard: React.FC<CommunityCardProps> = React.memo(({ item, onPress }) => {
+  const { t } = useTranslation();
   const { themeMode } = useThemeStore();
   const colors = getColors(themeMode);
   const isDarkMode = themeMode === 'dark';
@@ -20,8 +22,9 @@ const CommunityCard: React.FC<CommunityCardProps> = React.memo(({ item, onPress 
     onPress(item.id);
   };
 
-  // Format member count, e.g. 2450 -> "2,450"
+  // Format statistics
   const formattedMembers = item.memberCount.toLocaleString();
+  const formattedPosts = item.postCount.toLocaleString();
 
   const dynamicStyles = React.useMemo(() => {
     return {
@@ -69,7 +72,7 @@ const CommunityCard: React.FC<CommunityCardProps> = React.memo(({ item, onPress 
         <View style={styles.statsContainer}>
           <Users size={16} color={colors.textLight} style={styles.footerIcon} />
           <CustomText preset="bodySmall" color="textSecondary">
-            {formattedMembers} members
+            {formattedMembers} {t('communityDetails.members')}  •  {formattedPosts} {t('communityDetails.posts')}
           </CustomText>
         </View>
 

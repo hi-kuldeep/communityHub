@@ -38,5 +38,16 @@
     "emailInvalid": "Please enter a valid email address",
     "passwordRequired": "Password is required",
     "passwordMin": "Password must be at least 6 characters"
+  },
+  "communityDetails": {
+    "members": "members",
+    "posts": "posts",
+    "join": "Join",
+    "leave": "Leave",
+    "postsSectionTitle": "Posts",
+    "noPosts": "No posts in this community yet.",
+    "about": "About",
+    "loadError": "Could not load community details.",
+    "postsLoadError": "Could not load posts."
   }
 }

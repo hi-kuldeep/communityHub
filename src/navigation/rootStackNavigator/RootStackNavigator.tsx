@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { createNativeStackNavigator, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { rootStackParams } from './rootStackParams';
 import { rootStackName } from './rootStackName';
@@ -10,6 +13,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 import LoadingSpinner from '@/components/placeholder/LoadingSpinner';
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
+import CommunityDetails from '@/screens/communityDetails/CommunityDetails';
+import ScreenHeader from '@/components/ScreenHeader';
 
 const Stack = createNativeStackNavigator<rootStackParams>();
 
@@ -65,6 +70,14 @@ const RootStackNavigator: React.FC = () => {
     >
       <Stack.Screen name={rootStackName.MAIN} component={BottomTabNavigator} />
       <Stack.Screen name={rootStackName.AUTH} component={AuthStackNavigator} />
+      <Stack.Screen
+        name={rootStackName.COMMUNITY_DETAILS}
+        component={CommunityDetails}
+        options={{
+          header: () => <ScreenHeader title="" />,
+          headerShown: true,
+        }}
+      />
     </Stack.Navigator>
   );
 };
