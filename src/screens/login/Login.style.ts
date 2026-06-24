@@ -1,5 +1,6 @@
 import { StyleSheet, Platform } from 'react-native';
 import { spacing } from '@/theme/spacing';
+import { IS_IOS } from '@/constants/deviceInfo';
 
 const loginStyle = StyleSheet.create({
   outerContainer: {
@@ -80,7 +81,7 @@ const loginStyle = StyleSheet.create({
     padding: spacing.xl,
     width: '100%',
     zIndex: 2,
-    shadowColor: '#000',
+    shadowColor: IS_IOS ? '#000' : 'transparent',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.08,
     shadowRadius: 16,

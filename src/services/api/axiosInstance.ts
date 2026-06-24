@@ -9,9 +9,9 @@ import { useAuthStore } from '@/store/useAuthStore';
 // Resolve mock server port in dev mode, staging/prod URL in release mode
 const baseURL = __DEV__
   ? Platform.select({
-      ios: 'http://localhost:3000',
-      android: 'http://10.0.2.2:3000',
-      default: 'http://localhost:3000',
+      ios: 'https://community-hub-backend-hgxl.onrender.com/',
+      android: 'https://community-hub-backend-hgxl.onrender.com/',
+      default: 'https://community-hub-backend-hgxl.onrender.com/',
     })
   : '';
 
@@ -24,7 +24,7 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(config => {
   config.headers['Accept-Language'] = i18n.language;
-  
+
   // Resolve current authenticated user state dynamically from Zustand
   const authState = useAuthStore.getState();
   const token = authState.token;
@@ -73,7 +73,10 @@ axiosInstance.interceptors.response.use(
     ) {
       showModal({
         type: 'error',
-        message: err?.response?.data?.message || err?.message || 'Something went wrong!',
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          'Something went wrong!',
       });
     }
     throw err;
