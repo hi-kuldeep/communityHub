@@ -100,18 +100,14 @@ const Login = () => {
             {...getInputProps('password')}
           />
 
-          {/* Forgot Password action */}
-          <View style={styles.actionsRow}>
-            <View />
-            <TouchableOpacity activeOpacity={0.7}>
-              <CustomText
-                preset="bodySmall"
-                color="primary"
-                style={styles.forgotPasswordLabel}
-              >
-                {t('login.forgotPassword')}
-              </CustomText>
-            </TouchableOpacity>
+          {/* Demo Credentials hint */}
+          <View style={styles.demoCredentialsContainer}>
+            <CustomText preset="bodySmall" color="textSecondary" style={styles.demoCredentialsLabel}>
+              Demo Credentials:
+            </CustomText>
+            <CustomText preset="bodyMedium" color="primary" style={styles.demoCredentialsValue}>
+              test@gmail.com   |   123456
+            </CustomText>
           </View>
 
           {/* Sign In Button with Ambient Glow */}
@@ -123,26 +119,6 @@ const Login = () => {
           >
             {t('login.signIn')}
           </CustomButton>
-        </View>
-
-        {/* Footer Account Link */}
-        <View style={styles.footerRow}>
-          <CustomText
-            preset="bodyMedium"
-            color="textSecondary"
-            style={styles.footerText}
-          >
-            {t('login.noAccount')}
-          </CustomText>
-          <TouchableOpacity activeOpacity={0.7}>
-            <CustomText
-              preset="bodyMedium"
-              color="primary"
-              style={styles.footerLink}
-            >
-              {t('login.signUp')}
-            </CustomText>
-          </TouchableOpacity>
         </View>
       </View>
     </Container>

@@ -35,8 +35,8 @@ export const useLogin = () => {
 
   const form = useForm({
     initialValues: {
-      email: __DEV__ ? 'test@gmail.com' : '',
-      password: __DEV__ ? '123456' : '',
+      email: '',
+      password: '',
     },
     validationSchema: loginSchema,
     onSubmit: async values => {

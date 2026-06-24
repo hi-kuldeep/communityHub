@@ -167,6 +167,20 @@ const loginStyle = StyleSheet.create({
     fontWeight: '600',
     marginLeft: spacing.sm,
   },
+  // Demo Credentials hint
+  demoCredentialsContainer: {
+    alignItems: 'center',
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+  },
+  demoCredentialsLabel: {
+    fontSize: 12,
+  },
+  demoCredentialsValue: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: spacing.xs,
+  },
   // Bottom Link
   footerRow: {
     flexDirection: 'row',
