@@ -60,13 +60,9 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     if (typeof children === 'string') {
       let resolvedTextColor: string = colors.textOnPrimary;
       if (mode === 'outlined') {
-        resolvedTextColor = disabled
-          ? colors.textLight
-          : colors.primary;
+        resolvedTextColor = disabled ? colors.textLight : colors.primary;
       } else if (mode === 'text') {
-        resolvedTextColor = disabled
-          ? colors.textLight
-          : colors.primary;
+        resolvedTextColor = disabled ? colors.textLight : colors.primary;
       }
 
       return (
@@ -153,7 +149,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   pressed: {
-    opacity: 0.8,
+    transform: [{ scale: 0.97 }],
   },
 });
 

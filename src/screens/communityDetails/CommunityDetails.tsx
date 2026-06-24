@@ -1,5 +1,10 @@
 import React from 'react';
-import { View, ActivityIndicator, TouchableOpacity } from 'react-native';
+import {
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react-native';
@@ -241,15 +246,20 @@ const CommunityDetails = () => {
       {renderContent()}
 
       {/* Floating Action Button – Create Post */}
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.primary }]}
+      <Pressable
+        style={({ pressed }) => [
+          styles.fab,
+          { backgroundColor: colors.primary },
+          pressed && {
+            transform: [{ scale: 0.97 }],
+          },
+        ]}
         onPress={handleNavigateToCreatePost}
-        activeOpacity={0.85}
         accessibilityLabel={t('createPost.fabLabel')}
         accessibilityRole="button"
       >
         <Plus size={28} color="#ffffff" strokeWidth={2.5} />
-      </TouchableOpacity>
+      </Pressable>
     </Container>
   );
 };

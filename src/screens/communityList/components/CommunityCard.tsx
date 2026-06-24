@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { Users, ChevronRight } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import CustomText from '@/components/CustomText';
@@ -12,75 +12,98 @@ interface CommunityCardProps {
   onPress: (id: string) => void;
 }
 
-const CommunityCard: React.FC<CommunityCardProps> = React.memo(({ item, onPress }) => {
-  const { t } = useTranslation();
-  const { themeMode } = useThemeStore();
-  const colors = getColors(themeMode);
-  const isDarkMode = themeMode === 'dark';
+const CommunityCard: React.FC<CommunityCardProps> = React.memo(
+  ({ item, onPress }) => {
+    const { t } = useTranslation();
+    const { themeMode } = useThemeStore();
+    const colors = getColors(themeMode);
+    const isDarkMode = themeMode === 'dark';
 
-  const handlePress = () => {
-    onPress(item.id);
-  };
-
-  // Format statistics
-  const formattedMembers = item.memberCount.toLocaleString();
-  const formattedPosts = item.postCount.toLocaleString();
-
-  const dynamicStyles = React.useMemo(() => {
-    return {
-      card: {
-        backgroundColor: colors.surface,
-        borderColor: colors.border,
-      },
-      joinedBadge: {
-        backgroundColor: isDarkMode ? 'rgba(52, 168, 83, 0.15)' : 'rgba(52, 168, 83, 0.1)',
-        borderColor: isDarkMode ? 'rgba(52, 168, 83, 0.3)' : 'rgba(52, 168, 83, 0.2)',
-      },
-      cardFooter: {
-        borderTopColor: colors.border,
-      },
+    const handlePress = () => {
+      onPress(item.id);
     };
-  }, [colors.surface, colors.border, isDarkMode]);
 
-  return (
-    <TouchableOpacity
-      style={[styles.card, dynamicStyles.card]}
-      onPress={handlePress}
-      activeOpacity={0.7}
-    >
-      <View style={styles.cardHeader}>
-        <View style={styles.nameContainer}>
-          <CustomText preset="bodyLarge" color="text" style={styles.nameText}>
-            {item.name}
-          </CustomText>
-        </View>
+    // Format statistics
+    const formattedMembers = item.memberCount.toLocaleString();
+    const formattedPosts = item.postCount.toLocaleString();
 
-        {item.joined && (
-          <View style={[styles.joinedBadge, dynamicStyles.joinedBadge]}>
-            <CustomText preset="bodySmall" color="primary" style={styles.joinedText}>
-              Joined
+    const dynamicStyles = React.useMemo(() => {
+      return {
+        card: {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+        joinedBadge: {
+          backgroundColor: isDarkMode
+            ? 'rgba(52, 168, 83, 0.15)'
+            : 'rgba(52, 168, 83, 0.1)',
+          borderColor: isDarkMode
+            ? 'rgba(52, 168, 83, 0.3)'
+            : 'rgba(52, 168, 83, 0.2)',
+        },
+        cardFooter: {
+          borderTopColor: colors.border,
+        },
+      };
+    }, [colors.surface, colors.border, isDarkMode]);
+
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.card,
+          dynamicStyles.card,
+          pressed && styles.pressed,
+        ]}
+        onPress={handlePress}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.nameContainer}>
+            <CustomText preset="bodyLarge" color="text" style={styles.nameText}>
+              {item.name}
             </CustomText>
           </View>
-        )}
-      </View>
 
-      <CustomText preset="bodyMedium" color="textSecondary" numberOfLines={2} style={styles.description}>
-        {item.description}
-      </CustomText>
-
-      <View style={[styles.cardFooter, dynamicStyles.cardFooter]}>
-        <View style={styles.statsContainer}>
-          <Users size={16} color={colors.textLight} style={styles.footerIcon} />
-          <CustomText preset="bodySmall" color="textSecondary">
-            {formattedMembers} {t('communityDetails.members')}  •  {formattedPosts} {t('communityDetails.posts')}
-          </CustomText>
+          {item.joined && (
+            <View style={[styles.joinedBadge, dynamicStyles.joinedBadge]}>
+              <CustomText
+                preset="bodySmall"
+                color="primary"
+                style={styles.joinedText}
+              >
+                Joined
+              </CustomText>
+            </View>
+          )}
         </View>
 
-        <ChevronRight size={18} color={colors.textLight} />
-      </View>
-    </TouchableOpacity>
-  );
-});
+        <CustomText
+          preset="bodyMedium"
+          color="textSecondary"
+          numberOfLines={2}
+          style={styles.description}
+        >
+          {item.description}
+        </CustomText>
+
+        <View style={[styles.cardFooter, dynamicStyles.cardFooter]}>
+          <View style={styles.statsContainer}>
+            <Users
+              size={16}
+              color={colors.textLight}
+              style={styles.footerIcon}
+            />
+            <CustomText preset="bodySmall" color="textSecondary">
+              {formattedMembers} {t('communityDetails.members')} •{' '}
+              {formattedPosts} {t('communityDetails.posts')}
+            </CustomText>
+          </View>
+
+          <ChevronRight size={18} color={colors.textLight} />
+        </View>
+      </Pressable>
+    );
+  },
+);
 
 export default CommunityCard;
 
@@ -137,5 +160,8 @@ const styles = StyleSheet.create({
   },
   footerIcon: {
     marginRight: spacing.xs,
+  },
+  pressed: {
+    transform: [{ scale: 0.97 }],
   },
 });
