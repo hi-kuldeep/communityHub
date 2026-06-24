@@ -1,0 +1,244 @@
+{
+  "communities": [
+    {
+      "id": "1",
+      "name": "React Native Core",
+      "description": "Discuss architecture, performance, and best practices for building React Native apps at scale.",
+      "memberCount": 2450,
+      "joined": true
+    },
+    {
+      "id": "2",
+      "name": "Design System Alliance",
+      "description": "Shared UI tokens, component design patterns, styling strategies, and UX consistency guidelines.",
+      "memberCount": 1890,
+      "joined": false
+    },
+    {
+      "id": "3",
+      "name": "Fintech Mobile Builders",
+      "description": "Security, local biometrics, sandbox transactions, and compliance in mobile fintech applications.",
+      "memberCount": 1240,
+      "joined": false
+    },
+    {
+      "id": "4",
+      "name": "TypeScript Mastery",
+      "description": "Type safety patterns, custom validation logic, utility types, and structural type checks.",
+      "memberCount": 3100,
+      "joined": true
+    },
+    {
+      "id": "5",
+      "name": "iOS Swift Engineers",
+      "description": "Platform native bridges, Swift UI integrations, and performance benchmarks for iOS targets.",
+      "memberCount": 940,
+      "joined": false
+    },
+    {
+      "id": "6",
+      "name": "Android Kotlin Developers",
+      "description": "JNI libraries, Gradle scripts, and direct native wrappers for Kotlin code on Android SDKs.",
+      "memberCount": 880,
+      "joined": false
+    },
+    {
+      "id": "7",
+      "name": "Web3 & Decentralized Apps",
+      "description": "Cryptographic libraries, secure local storage, key chains, and decentralized RPC integrations.",
+      "memberCount": 1540,
+      "joined": false
+    },
+    {
+      "id": "8",
+      "name": "SaaS Architecture & Scale",
+      "description": "Multi-tenant applications, high-performance database caching, and offline-first queue queues.",
+      "memberCount": 2050,
+      "joined": true
+    },
+    {
+      "id": "9",
+      "name": "UI/UX Mobile Research",
+      "description": "User testing, cognitive load design, interactive micro-animations, and behavioral statistics.",
+      "memberCount": 1120,
+      "joined": false
+    },
+    {
+      "id": "10",
+      "name": "Local Caching Paradigms",
+      "description": "Zustand hydration, AsyncStorage write speed, MMKV benchmarks, and SQLite schemas.",
+      "memberCount": 750,
+      "joined": false
+    },
+    {
+      "id": "11",
+      "name": "JavaScript Performance Guild",
+      "description": "Garbage collection details, hermes optimizations, and main thread blocking reductions.",
+      "memberCount": 1980,
+      "joined": false
+    },
+    {
+      "id": "12",
+      "name": "Apollo & GraphQL Hub",
+      "description": "Structured queries, fragment cache normalization, updates, and optimistic mutation results.",
+      "memberCount": 1430,
+      "joined": false
+    },
+    {
+      "id": "13",
+      "name": "Product Design Leaders",
+      "description": "Collaborating across engineers, alignment benchmarks, Figma imports, and mockup reviews.",
+      "memberCount": 650,
+      "joined": false
+    },
+    {
+      "id": "14",
+      "name": "NextJS Server Side Hub",
+      "description": "Static generation, server actions, route structures, and middleware rendering speeds.",
+      "memberCount": 2800,
+      "joined": false
+    },
+    {
+      "id": "15",
+      "name": "Docker & Kubernetes Core",
+      "description": "Container pipelines, automated build scripts, image sizing, and devops setup.",
+      "memberCount": 1650,
+      "joined": false
+    },
+    {
+      "id": "16",
+      "name": "CyberSecurity Mobile Guild",
+      "description": "SSL pinning, code obfuscation, reverse engineering prevention, and secure inputs.",
+      "memberCount": 1020,
+      "joined": false
+    },
+    {
+      "id": "17",
+      "name": "Rust Systems Integrations",
+      "description": "Building native Rust crates compile-targeted for iOS/Android native execution.",
+      "memberCount": 1220,
+      "joined": false
+    },
+    {
+      "id": "18",
+      "name": "Machine Learning Edge",
+      "description": "TensorFlow Lite benchmarks, local model inference, and camera object detection.",
+      "memberCount": 930,
+      "joined": false
+    },
+    {
+      "id": "19",
+      "name": "State Management Experts",
+      "description": "Zustand vs Redux Toolkit, mobx strategies, context performance, and selector caches.",
+      "memberCount": 1470,
+      "joined": false
+    },
+    {
+      "id": "20",
+      "name": "Testing & QA Automation",
+      "description": "Detox e2e testing, jest unit test mocks, coverage metrics, and pipeline runner checks.",
+      "memberCount": 810,
+      "joined": false
+    },
+    {
+      "id": "21",
+      "name": "E-commerce Devs",
+      "description": "Shopping carts, local sync queues, quick payment integrations, and analytics loops.",
+      "memberCount": 1390,
+      "joined": false
+    },
+    {
+      "id": "22",
+      "name": "Accessibility A11y Team",
+      "description": "Screen reader alignment, accessible contrast ratios, layout sizes, and keyboard guides.",
+      "memberCount": 710,
+      "joined": false
+    },
+    {
+      "id": "23",
+      "name": "Serverless Functions Core",
+      "description": "AWS Lambda, Vercel deployments, cold start reductions, and Edge database connections.",
+      "memberCount": 1750,
+      "joined": false
+    },
+    {
+      "id": "24",
+      "name": "SVG Vector Animation Art",
+      "description": "Complex path calculations, micro-interaction transitions, and fluid interactive maps.",
+      "memberCount": 1190,
+      "joined": false
+    },
+    {
+      "id": "25",
+      "name": "NoSQL Databases & Scaling",
+      "description": "MongoDB schemas, DynamoDB design keys, consistency limits, and index setups.",
+      "memberCount": 1320,
+      "joined": false
+    },
+    {
+      "id": "26",
+      "name": "Productivity Hacks Group",
+      "description": "Automated workspace configurations, dotfiles, keyboard mappings, and shell commands.",
+      "memberCount": 2200,
+      "joined": false
+    },
+    {
+      "id": "27",
+      "name": "AI Prompts Engineering",
+      "description": "Context windows, few-shot prompt templates, local LLM tooling, and temperature tuning.",
+      "memberCount": 1560,
+      "joined": false
+    },
+    {
+      "id": "28",
+      "name": "Micro-Frontend Foundations",
+      "description": "Module federation, styling separation, independent deployments, and shared states.",
+      "memberCount": 1040,
+      "joined": false
+    },
+    {
+      "id": "29",
+      "name": "CSS Grid & Flex Masterclass",
+      "description": "Modern css layout, cross browser fixes, subgrid options, and clean media targets.",
+      "memberCount": 990,
+      "joined": false
+    },
+    {
+      "id": "30",
+      "name": "Developer Relational Guild",
+      "description": "Advocacy strategy, docs formatting, hackathons, and community metrics reporting.",
+      "memberCount": 1110,
+      "joined": false
+    }
+  ],
+  "posts": [
+    {
+      "id": "post-1",
+      "communityId": "1",
+      "title": "React Native 0.86 New Architecture",
+      "body": "Discussing concurrent rendering, synchronous layouts, and the new bridge-less mode in 0.86.",
+      "createdAt": "2026-06-24T09:00:00.000Z"
+    },
+    {
+      "id": "post-2",
+      "communityId": "1",
+      "title": "Hermes GC tuning guide",
+      "body": "How to configure the Hermes garbage collector for large datasets and heavy scroll lists.",
+      "createdAt": "2026-06-24T09:15:00.000Z"
+    },
+    {
+      "id": "post-3",
+      "communityId": "2",
+      "title": "Shared UI Tokens structure",
+      "body": "Organizing styling tokens for flexible dark/light theme switching and seamless theme updates.",
+      "createdAt": "2026-06-24T08:30:00.000Z"
+    },
+    {
+      "id": "post-4",
+      "communityId": "4",
+      "title": "Strict type checks for forms",
+      "body": "Formik and Yup integration with strict type assertions to avoid dynamic runtime errors.",
+      "createdAt": "2026-06-24T09:20:00.000Z"
+    }
+  ]
+}

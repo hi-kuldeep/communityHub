@@ -1,9 +1,17 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 
 import { showModal } from '@/components/modalProvider/ModalProvider';
 import i18n from '@/localization';
 
-const baseURL = '';
+// Resolve mock server port in dev mode, staging/prod URL in release mode
+const baseURL = __DEV__
+  ? Platform.select({
+      ios: 'http://localhost:3000',
+      android: 'http://10.0.2.2:3000',
+      default: 'http://localhost:3000',
+    })
+  : '';
 
 const axiosInstance = axios.create({
   baseURL,
@@ -17,7 +25,7 @@ axiosInstance.interceptors.request.use(config => {
   // Add Authorization header if token exists
   const token = '';
   if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
