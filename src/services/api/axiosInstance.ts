@@ -29,6 +29,13 @@ axiosInstance.interceptors.request.use(config => {
   const authState = useAuthStore.getState();
   const token = authState.token;
   const userId = authState.user?.id;
+  const expiresAt = authState.expiresAt;
+
+  // Intercept requests and auto-logout on client side if the token has expired
+  if (expiresAt && Date.now() > expiresAt) {
+    authState.logout();
+    return Promise.reject(new Error('Session expired. Please log in again.'));
+  }
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -52,16 +59,17 @@ axiosInstance.interceptors.response.use(
   err => {
     console.log('err', err?.response);
 
+    // Auto logout on 401 Unauthorized errors (except for the login request itself)
     if (
       err?.response?.status === 401 &&
       err?.response?.config?.url !== '/users/login'
     ) {
-      // Handle logout here
+      useAuthStore.getState().logout();
     }
 
     showModal({
       type: 'error',
-      message: err?.response?.data?.message || 'Something went wrong!',
+      message: err?.response?.data?.message || err?.message || 'Something went wrong!',
     });
     throw err;
   },

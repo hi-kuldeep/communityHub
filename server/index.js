@@ -22,7 +22,7 @@ const readDatabase = () => {
 };
 
 // Helper to write database content
-const writeDatabase = (data) => {
+const writeDatabase = data => {
   try {
     fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf8');
   } catch (error) {
@@ -36,30 +36,32 @@ const writeDatabase = (data) => {
  */
 const getUserIdAndUpsert = (req, db) => {
   const userId = req.headers['x-user-id'] || 'usr_test';
-  
+
   db.users = db.users || [];
-  let user = db.users.find((u) => u.id === userId);
-  
+  let user = db.users.find(u => u.id === userId);
+
   if (!user) {
-    const cleanName = userId.includes('@') 
-      ? userId.split('@')[0] 
-      : userId.startsWith('usr_') 
-        ? `User_${userId.slice(4, 8)}` 
-        : userId;
-        
+    const cleanName = userId.includes('@')
+      ? userId.split('@')[0]
+      : userId.startsWith('usr_')
+      ? `User_${userId.slice(4, 8)}`
+      : userId;
+
     user = {
       id: userId,
       name: cleanName,
       email: userId.includes('@') ? userId : `${userId}@example.com`,
-      avatar: `https://randomuser.me/api/portraits/lego/${Math.floor(Math.random() * 9)}.jpg`,
+      avatar: `https://randomuser.me/api/portraits/lego/${Math.floor(
+        Math.random() * 9,
+      )}.jpg`,
       location: 'Dubai',
     };
-    
+
     db.users.push(user);
     writeDatabase(db);
     console.log(`[Mock Server] Dynamic registration of active user: ${userId}`);
   }
-  
+
   return userId;
 };
 
@@ -74,18 +76,20 @@ const getUserIdAndUpsert = (req, db) => {
 app.get('/communities', (req, res) => {
   const db = readDatabase();
   const userId = getUserIdAndUpsert(req, db);
-  
-  let communities = (db.communities || []).map((c) => {
+
+  let communities = (db.communities || []).map(c => {
     // 1. Dynamically calculate joined status from memberships table for this specific user
     const isJoined = (db.memberships || []).some(
-      (m) => m.userId === userId && m.communityId === c.id
+      m => m.userId === userId && m.communityId === c.id,
     );
     // 2. Dynamically calculate genuine memberCount (strictly count matching records in memberships table)
     const finalMemberCount = (db.memberships || []).filter(
-      (m) => m.communityId === c.id
+      m => m.communityId === c.id,
     ).length;
     // 3. Dynamically calculate genuine postCount (posts table count matching this communityId)
-    const postCount = (db.posts || []).filter((p) => p.communityId === c.id).length;
+    const postCount = (db.posts || []).filter(
+      p => p.communityId === c.id,
+    ).length;
 
     return {
       ...c,
@@ -99,9 +103,9 @@ app.get('/communities', (req, res) => {
   const search = (req.query.search || '').toString().trim().toLowerCase();
   if (search) {
     communities = communities.filter(
-      (c) =>
+      c =>
         (c.name || '').toLowerCase().includes(search) ||
-        (c.description || '').toLowerCase().includes(search)
+        (c.description || '').toLowerCase().includes(search),
     );
   }
 
@@ -149,9 +153,11 @@ app.patch('/communities/:id', (req, res) => {
   const communities = db.communities || [];
   const memberships = db.memberships || [];
 
-  const communityIndex = communities.findIndex((c) => c.id === id);
+  const communityIndex = communities.findIndex(c => c.id === id);
   if (communityIndex === -1) {
-    return res.status(404).json({ message: `Community with ID ${id} not found.` });
+    return res
+      .status(404)
+      .json({ message: `Community with ID ${id} not found.` });
   }
 
   const community = communities[communityIndex];
@@ -160,7 +166,7 @@ app.patch('/communities/:id', (req, res) => {
   if (req.body.joined !== undefined) {
     const isJoined = req.body.joined;
     const membershipIndex = memberships.findIndex(
-      (m) => m.userId === userId && m.communityId === id
+      m => m.userId === userId && m.communityId === id,
     );
 
     if (isJoined && membershipIndex === -1) {
@@ -183,17 +189,13 @@ app.patch('/communities/:id', (req, res) => {
   writeDatabase({ ...db, communities, memberships });
 
   // Dynamically calculate values for response
-  const finalMemberCount = memberships.filter(
-    (m) => m.communityId === id
-  ).length;
-  const postCount = (db.posts || []).filter((p) => p.communityId === id).length;
+  const finalMemberCount = memberships.filter(m => m.communityId === id).length;
+  const postCount = (db.posts || []).filter(p => p.communityId === id).length;
 
   // Calculate and return updated community object with dynamic attributes
   return res.json({
     ...updatedCommunity,
-    joined: memberships.some(
-      (m) => m.userId === userId && m.communityId === id
-    ),
+    joined: memberships.some(m => m.userId === userId && m.communityId === id),
     memberCount: finalMemberCount,
     postCount: postCount,
   });
@@ -209,14 +211,16 @@ app.get('/posts', (req, res) => {
   const communityId = req.query.communityId;
 
   if (!communityId) {
-    return res.status(400).json({ message: 'Missing required query parameter: communityId' });
+    return res
+      .status(400)
+      .json({ message: 'Missing required query parameter: communityId' });
   }
 
-  const posts = (db.posts || []).filter((p) => p.communityId === communityId);
+  const posts = (db.posts || []).filter(p => p.communityId === communityId);
 
   // Map each post to include corresponding author details from users table
-  const populatedPosts = posts.map((post) => {
-    let author = (db.users || []).find((u) => u.id === post.authorId);
+  const populatedPosts = posts.map(post => {
+    let author = (db.users || []).find(u => u.id === post.authorId);
     if (!author) {
       author = {
         id: post.authorId,
@@ -249,7 +253,11 @@ app.post('/posts', (req, res) => {
   const { communityId, title, body } = req.body;
 
   if (!communityId || !title || !body) {
-    return res.status(400).json({ message: 'Missing required fields: communityId, title, or body' });
+    return res
+      .status(400)
+      .json({
+        message: 'Missing required fields: communityId, title, or body',
+      });
   }
 
   const newPost = {
@@ -265,20 +273,96 @@ app.post('/posts', (req, res) => {
   posts.push(newPost);
   writeDatabase({ ...db, posts });
 
-  const author = (db.users || []).find((u) => u.id === userId);
+  const author = (db.users || []).find(u => u.id === userId);
   const populatedPost = {
     ...newPost,
-    author: author ? {
-      id: author.id,
-      name: author.name,
-      email: author.email,
-      avatar: author.avatar,
-    } : null,
+    author: author
+      ? {
+          id: author.id,
+          name: author.name,
+          email: author.email,
+          avatar: author.avatar,
+        }
+      : null,
   };
 
   return res.status(201).json(populatedPost);
 });
 
+/**
+ * POST /users/login
+ * Validates/registers a user and returns authentication token with expiration details
+ */
+app.post('/users/login', (req, res) => {
+  const db = readDatabase();
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ message: 'Email and password are required.' });
+  }
+
+  // Generate deterministic ID from email for persistent mock tracking
+  const username = email.split('@')[0];
+  const userId = `usr_${username}`;
+
+  db.users = db.users || [];
+  let user = db.users.find(u => u.id === userId || u.email === email);
+
+  if (!user) {
+    user = {
+      id: userId,
+      name: username.charAt(0).toUpperCase() + username.slice(1),
+      email: email,
+      avatar: `https://randomuser.me/api/portraits/lego/${Math.floor(
+        Math.random() * 9,
+      )}.jpg`,
+      location: 'Dubai',
+    };
+    db.users.push(user);
+    writeDatabase(db);
+    console.log(`[Mock Server] Registered new user during login: ${email}`);
+  }
+
+  const token = `fake_jwt_token_${Date.now()}`;
+  // const expiresAt = Date.now() + 3600 * 1000; // Token valid for 1 hour
+  const expiresAt = Date.now() + 30 * 1000; // Token valid for 30 seconds
+
+  return res.json({
+    token,
+    user,
+    expiresAt,
+  });
+});
+
+/**
+ * PATCH /users/profile
+ * Updates the current user's profile details in the database
+ */
+app.patch('/users/profile', (req, res) => {
+  const db = readDatabase();
+  const userId = getUserIdAndUpsert(req, db);
+
+  const userIndex = db.users.findIndex(u => u.id === userId);
+  if (userIndex === -1) {
+    return res.status(404).json({ message: 'User not found.' });
+  }
+
+  const updatedUser = {
+    ...db.users[userIndex],
+    ...req.body,
+  };
+
+  db.users[userIndex] = updatedUser;
+  writeDatabase(db);
+
+  console.log(`[Mock Server] Updated user profile for: ${userId}`);
+  return res.json(updatedUser);
+});
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[Mock Server] Relational multi-user mock server is running on http://localhost:${PORT}`);
+  console.log(
+    `[Mock Server] Relational multi-user mock server is running on http://localhost:${PORT}`,
+  );
 });

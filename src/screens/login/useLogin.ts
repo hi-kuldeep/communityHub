@@ -1,13 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
+import { useMutation } from '@tanstack/react-query';
 import useForm from '@/hooks/useForm';
 import { useAuthStore } from '@/store/useAuthStore';
+import { loginUser } from '@/services/api/userService';
 
 export const useLogin = () => {
   const { t } = useTranslation();
   const { login } = useAuthStore();
-  const [loading, setLoading] = useState(false);
 
   const loginSchema = useMemo(() => {
     return Yup.object().shape({
@@ -20,6 +21,18 @@ export const useLogin = () => {
     });
   }, [t]);
 
+  // Handle the login API request as a TanStack Query mutation
+  const loginMutation = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) =>
+      loginUser(email, password),
+    onSuccess: async data => {
+      await login(data);
+    },
+    onError: error => {
+      console.error('Login submit error', error);
+    },
+  });
+
   const form = useForm({
     initialValues: {
       email: __DEV__ ? 'test@gmail.com' : '',
@@ -27,25 +40,16 @@ export const useLogin = () => {
     },
     validationSchema: loginSchema,
     onSubmit: async values => {
-      setLoading(true);
-      try {
-        // Simulate API request using 1 second delay
-        await new Promise<void>(resolve => setTimeout(() => resolve(), 1000));
-        const timestamp = Date.now();
-        const fakeToken = `fake_jwt_token_${timestamp}`;
-
-        await login(values.email, fakeToken);
-      } catch (error) {
-        console.error('Login submit error', error);
-      } finally {
-        setLoading(false);
-      }
+      loginMutation.mutate({
+        email: values.email,
+        password: values.password,
+      });
     },
   });
 
   return {
     form,
-    loading,
+    loading: loginMutation.isPending,
   };
 };
 

@@ -1,14 +1,13 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Users, ChevronRight } from 'lucide-react-native';
-import { Community } from '@/types/community';
 import CustomText from '@/components/CustomText';
 import { useThemeStore } from '@/store/useThemeStore';
 import { getColors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 
 interface CommunityCardProps {
-  item: Community;
+  item: ICommunity;
   onPress: (id: string) => void;
 }
 

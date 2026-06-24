@@ -1,44 +1,24 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  profilePicture?: string;
-  location?: string;
-  token?: string;
-}
-
-interface AuthState {
-  token: string | null;
-  isAuthenticated: boolean;
-  isRestoring: boolean;
-  user: User | null;
-  login: (email: string, token: string, userDetails?: Partial<User>) => Promise<void>;
-  logout: () => Promise<void>;
-  restoreSession: () => Promise<void>;
-}
-
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<IAuthState>((set, get) => ({
   token: null,
   isAuthenticated: false,
   isRestoring: true,
   user: null,
+  expiresAt: null,
 
-  login: async (email, token, userDetails) => {
-    const user: User = {
-      id: `usr_${Date.now()}`,
-      email,
-      name: email.split('@')[0],
-      location: 'Dubai',
-      profilePicture: undefined,
-      ...userDetails,
+  login: async ({ token, expiresAt, user }) => {
+    const normalizedUser: IUser = {
+      ...user,
+      profilePicture: user.profilePicture || user.avatar,
+      avatar: user.avatar || user.profilePicture,
     };
     try {
       await AsyncStorage.setItem('auth-token', token);
-      await AsyncStorage.setItem('auth-user', JSON.stringify(user));
-      set({ token, user, isAuthenticated: true });
+      await AsyncStorage.setItem('auth-user', JSON.stringify(normalizedUser));
+      await AsyncStorage.setItem('auth-expires-at', expiresAt.toString());
+      set({ token, user: normalizedUser, expiresAt, isAuthenticated: true });
     } catch (error) {
       console.error('Failed to save auth state', error);
     }
@@ -48,7 +28,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await AsyncStorage.removeItem('auth-token');
       await AsyncStorage.removeItem('auth-user');
-      set({ token: null, user: null, isAuthenticated: false });
+      await AsyncStorage.removeItem('auth-expires-at');
+      set({ token: null, user: null, expiresAt: null, isAuthenticated: false });
     } catch (error) {
       console.error('Failed to clear auth state', error);
     }
@@ -59,14 +40,26 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const token = await AsyncStorage.getItem('auth-token');
       const userStr = await AsyncStorage.getItem('auth-user');
-      if (token && userStr) {
-        set({
-          token,
-          user: JSON.parse(userStr),
-          isAuthenticated: true,
-        });
+      const expiresAtStr = await AsyncStorage.getItem('auth-expires-at');
+
+      if (token && userStr && expiresAtStr) {
+        const expiresAt = parseInt(expiresAtStr, 10);
+
+        // Enforce session timeout on launch if token has expired
+        if (Date.now() > expiresAt) {
+          console.log('[Auth] Restored session has expired. Logging out...');
+          const logoutFn = get().logout;
+          await logoutFn();
+        } else {
+          set({
+            token,
+            user: JSON.parse(userStr),
+            expiresAt,
+            isAuthenticated: true,
+          });
+        }
       } else {
-        set({ token: null, user: null, isAuthenticated: false });
+        set({ token: null, user: null, expiresAt: null, isAuthenticated: false });
       }
     } catch (error) {
       console.error('Failed to restore session', error);
@@ -74,6 +67,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       // Small artificial delay to show a loading state cleanly on launch
       await new Promise<void>((resolve) => setTimeout(() => resolve(), 800));
       set({ isRestoring: false });
+    }
+  },
+
+  updateUser: async (updatedFields) => {
+    const currentUser = get().user;
+    if (!currentUser) return;
+    const normalizedUser: IUser = {
+      ...currentUser,
+      ...updatedFields,
+      profilePicture: updatedFields.profilePicture || updatedFields.avatar || currentUser.profilePicture || currentUser.avatar,
+      avatar: updatedFields.avatar || updatedFields.profilePicture || currentUser.avatar || currentUser.profilePicture,
+    };
+    try {
+      await AsyncStorage.setItem('auth-user', JSON.stringify(normalizedUser));
+      set({ user: normalizedUser });
+    } catch (error) {
+      console.error('Failed to update user in store', error);
     }
   },
 }));
