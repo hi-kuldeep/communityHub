@@ -40,10 +40,20 @@ export const useLogin = () => {
     },
     validationSchema: loginSchema,
     onSubmit: async values => {
-      loginMutation.mutate({
-        email: values.email,
-        password: values.password,
-      });
+      try {
+        await loginMutation.mutateAsync({
+          email: values.email,
+          password: values.password,
+        });
+      } catch (error: any) {
+        const apiErrorMessage =
+          error?.response?.data?.message || 'Invalid email or password.';
+        if (apiErrorMessage.toLowerCase().includes('user not found')) {
+          form.setFieldError('email', apiErrorMessage);
+        } else {
+          form.setFieldError('password', apiErrorMessage);
+        }
+      }
     },
   });
 

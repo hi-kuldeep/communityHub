@@ -311,18 +311,14 @@ app.post('/users/login', (req, res) => {
   let user = db.users.find(u => u.id === userId || u.email === email);
 
   if (!user) {
-    user = {
-      id: userId,
-      name: username.charAt(0).toUpperCase() + username.slice(1),
-      email: email,
-      avatar: `https://randomuser.me/api/portraits/lego/${Math.floor(
-        Math.random() * 9,
-      )}.jpg`,
-      location: 'Dubai',
-    };
-    db.users.push(user);
-    writeDatabase(db);
-    console.log(`[Mock Server] Registered new user during login: ${email}`);
+    console.log(`[Mock Server] Login attempt for unregistered email: ${email}`);
+    return res.status(401).json({ message: 'User not found.' });
+  } else {
+    // If the user exists, validate their password only if they have a password field configured in the database
+    if (user.password && password !== user.password) {
+      console.log(`[Mock Server] Incorrect password attempt for user: ${email}`);
+      return res.status(401).json({ message: 'Incorrect password. Please try again.' });
+    }
   }
 
   const token = `fake_jwt_token_${Date.now()}`;

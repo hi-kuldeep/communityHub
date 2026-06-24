@@ -67,10 +67,15 @@ axiosInstance.interceptors.response.use(
       useAuthStore.getState().logout();
     }
 
-    showModal({
-      type: 'error',
-      message: err?.response?.data?.message || err?.message || 'Something went wrong!',
-    });
+    if (
+      err?.response?.config?.url !== '/users/login' &&
+      !err?.response?.config?.url?.endsWith('/users/login')
+    ) {
+      showModal({
+        type: 'error',
+        message: err?.response?.data?.message || err?.message || 'Something went wrong!',
+      });
+    }
     throw err;
   },
 );

@@ -2,9 +2,18 @@
   "users": [
     {
       "id": "usr_test",
-      "name": "test",
+      "name": "Test User",
       "email": "test@gmail.com",
+      "password": "123456",
       "avatar": "https://randomuser.me/api/portraits/men/1.jpg",
+      "location": "Dubai"
+    },
+    {
+      "id": "usr_simple",
+      "name": "Simple User",
+      "email": "user@gmail.com",
+      "password": "123456",
+      "avatar": "https://randomuser.me/api/portraits/lego/1.jpg",
       "location": "Dubai"
     },
     {
@@ -12,34 +21,47 @@
       "name": "Alex Rivera",
       "email": "alex@example.com",
       "avatar": "https://randomuser.me/api/portraits/men/2.jpg",
-      "location": "San Francisco"
+      "location": "San Francisco",
+      "password": "444555666"
     },
     {
       "id": "usr_sarah",
       "name": "Sarah Jenkins",
       "email": "sarah@example.com",
       "avatar": "https://randomuser.me/api/portraits/women/3.jpg",
-      "location": "London"
+      "location": "London",
+      "password": "555444333"
     },
     {
       "id": "usr_michael",
       "name": "Michael Chen",
       "email": "michael@example.com",
       "avatar": "https://randomuser.me/api/portraits/men/4.jpg",
-      "location": "Singapore"
+      "location": "Singapore",
+      "password": "888777666"
     },
     {
       "id": "usr_emily",
       "name": "Emily Watson",
       "email": "emily@example.com",
       "avatar": "https://randomuser.me/api/portraits/women/5.jpg",
-      "location": "Berlin"
+      "location": "Berlin",
+      "password": "987654321"
     },
     {
       "id": "usr_1782273515751",
       "name": "User_1782",
-      "email": "usr_1782273515751@example.com",
+      "email": "User_1782@example.com",
       "avatar": "https://randomuser.me/api/portraits/lego/3.jpg",
+      "location": "Dubai",
+      "password": "123456"
+    },
+    {
+      "id": "usr_asda",
+      "name": "Asda",
+      "email": "asda@gmail.com",
+      "password": "1234563",
+      "avatar": "https://randomuser.me/api/portraits/lego/5.jpg",
       "location": "Dubai"
     }
   ],
