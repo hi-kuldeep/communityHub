@@ -22,6 +22,48 @@
 
 ---
 
+## 🛠️ Setup & Running Instructions
+
+### Prerequisites
+Before running, make sure your machine has the following tools set up:
+*   **Node.js**: Version 18.x or 20.x
+*   **Yarn** or **npm**
+*   **Watchman**: `brew install watchman` (macOS)
+*   **CocoaPods**: For iOS dependencies (`sudo gem install cocoapods`)
+*   **Xcode** & **Android Studio** configured with simulators/emulators.
+
+### 🌐 Backend Service Configuration
+The API and database server are hosted in a separate Git repository:
+*   **Backend Repo**: [hi-kuldeep/community-hub-backend](https://github.com/hi-kuldeep/community-hub-backend)
+Please follow the instructions in the backend repository to set up and run the server before launching this mobile application.
+
+### 1. Installation
+Clone the repository and install dependency packages:
+```bash
+# Install node packages
+yarn install
+# or
+npm install
+```
+
+If targetting iOS, configure and install CocoaPods:
+```bash
+cd ios
+pod install
+cd ..
+```
+
+### 2. Launching the App
+1.  **Start Metro Bundler**:
+    ```bash
+    yarn start
+    ```
+2.  **Run Application**:
+    *   **iOS**: `yarn ios`
+    *   **Android**: `yarn android`
+
+---
+
 ## 📐 Architecture Overview
 
 The codebase is organized to enforce a strict **separation of concerns** (SoC), ensuring high testability, maintainability, and clean boundaries.
@@ -67,46 +109,24 @@ The application divides state into two logical layers: **Server State** (data fe
 
 ```mermaid
 graph TD
-    classDef server fill:#f5f3ff,stroke:#8b5cf6,stroke-width:2px;
-    classDef client fill:#eff6ff,stroke:#3b82f6,stroke-width:2px;
-    classDef native fill:#ecfdf5,stroke:#10b981,stroke-width:2px;
-
-    subgraph State Management Architecture
-        App[Application State Container] --> Server[Server State / Data Cache]
-        App --> Client[Client / UI / Local State]
-        
-        Server --> RQ[React Query / TanStack]:::server
-        Client --> Z[Zustand Store]:::client
-        
-        RQ --> C1[Communities List Cache]:::server
-        RQ --> C2[Posts Stream Cache]:::server
-        RQ --> C3[Community Details Cache]:::server
-        
-        Z --> Z1[Authentication Session]:::client
-        Z --> Z2[UI Style Preferences]:::client
-        Z --> Z3[Offline Pending Actions Queue]:::client
-        
-        Z3 -.-> AS[(AsyncStorage Persistence)]:::native
-        Z1 -.-> KC[(Keychain Storage)]:::native
-    end
+    App[Application State] --> Server[Server State - React Query]
+    App --> Client[Client State - Zustand]
+    
+    Server --> SData[Communities, Details, Posts]
+    Client --> CData[Session, Offline Queue, Settings]
+    
+    CData -.-> Storage[AsyncStorage & Keychain]
 ```
 
 ### Unidirectional Data Flow
-States undergo a strict unidirectional flow to ensure predictability, easing tracing of bugs:
+States undergo a strict unidirectional flow to ensure predictability:
 
 ```mermaid
 graph LR
-    classDef ui fill:#fff7ed,stroke:#ea580c,stroke-width:2px;
-    classDef service fill:#f8fafc,stroke:#64748b,stroke-width:2px;
-    classDef cache fill:#fafaf9,stroke:#78716c,stroke-width:2px;
-
-    UI[Screen UI Component]:::ui -->|1. User Interaction| Hook[useScreen Custom Hook]:::ui
-    Hook -->|2. Trigger Mutation| RQ[React Query Engine]:::service
-    RQ -->|3. API Call| Service[Axios API Layer]:::service
-    Service -->|4. Network Response| RQ
-    RQ -->|5. Optimistic Cache Update| Cache[(Query Cache)]:::cache
-    Cache -->|6. Trigger Hook Refresh| Hook
-    Hook -->|7. Bind Reactive State| UI
+    UI[Screen UI] -->|User Action| Hook[Custom Hook]
+    Hook -->|API Call| API[Backend API]
+    API -->|Response| Cache[React Query Cache]
+    Cache -->|Auto Re-render| UI
 ```
 
 ---
@@ -117,54 +137,22 @@ The offline architecture guarantees the application is functional and responsive
 
 ```mermaid
 sequenceDiagram
-    autonumber
-    actor User as User
-    participant UI as Screen UI / Hook
-    participant Cache as React Query Cache
-    participant Queue as Zustand Offline Queue
-    participant Storage as AsyncStorage (Persistent)
-    participant NetInfo as NetInfo Listener
-    participant Sync as Sync Manager
-    participant Server as Backend API Server
+    participant UI as Screen UI
+    participant Cache as Local Cache
+    participant Queue as Offline Queue
+    participant Server as Backend Server
 
-    Note over User, Server: 🛜 OFFLINE OPERATION
-    User ->> UI: Tap "Join Community"
-    NetInfo -->> UI: Network Status: Offline
-    UI ->> Queue: enqueue('join', communityId)
-    Queue ->> Storage: Write action to disk
-    UI ->> Cache: Optimistically set Joined = true
-    Cache -->> UI: Refresh cache & trigger re-render
-    Note over UI: User sees updated status instantly (Joined)
+    Note over UI, Server: Offline Mode
+    UI->>Queue: Save Join Action (Persisted)
+    UI->>Cache: Optimistic Update
+    Cache-->>UI: Instantly updates UI
 
-    Note over User, Server: ⚡ NETWORK RECONNECT
-    NetInfo ->> Sync: Network Status: Connected (Online)
-    Sync ->> Queue: Fetch sorted actions by timestamp
-    Queue ->> Storage: Read queue
-    Storage -->> Queue: Returns queue items
-    Queue -->> Sync: Action: join communityId
-
-    loop For each pending action in Queue
-        Sync ->> Server: POST /communities/:id/join
-        alt API Call Successful (200 OK)
-            Server -->> Sync: Success
-            Sync ->> Queue: dequeue(communityId)
-            Queue ->> Storage: Remove item from disk
-        else Client/Server Error (4xx/5xx)
-            Server -->> Sync: Error (e.g. 404 Not Found)
-            Note over Sync: Discard item to prevent blocking queue
-            Sync ->> Queue: dequeue(communityId)
-            Queue ->> Storage: Remove item from disk
-            Sync ->> UI: Alert user of failed sync action
-        else Flaky Connection / Timeout
-            Server -->> Sync: Timeout / Network error
-            Note over Sync: Pause sync until next connectivity change
-        end
-    end
-
-    Sync ->> Cache: Invalidate 'communityDetails' & 'communities'
-    Cache ->> Server: Refetch latest server state
-    Server -->> Cache: Return fresh data
-    Cache -->> UI: Update UI to match backend state
+    Note over UI, Server: Online Reconnect
+    Queue->>Server: Send Queued Actions
+    Server-->>Queue: Success Response
+    Queue->>Queue: Clear completed action
+    Server->>Cache: Fetch fresh data
+    Cache-->>UI: Sync UI with backend
 ```
 
 *   **Caching Reads**: React Query acts as the client-side data repository. The fetch strategies use configured cache windows and retries, loading details instantly from cached states when offline.
@@ -175,56 +163,14 @@ sequenceDiagram
 
 ## ⚙️ Technical Choices & Tradeoffs
 
-| Choice | Replaced Alternative | Justification & Architectural Tradeoffs |
-| :--- | :--- | :--- |
-| **React Query (TanStack)** | Redux Async Thunk / Custom Axios Cache | **Justification**: Handles remote caching, query states, retries, pagination, and caching out of the box.<br>**Tradeoff**: Requires understanding of stale/cache timers, but drastically cuts async state boilerplate. |
-| **Zustand** | Redux Toolkit / React Context | **Justification**: Zero-boilerplate global state management. Extremely lightweight, performant, and doesn't trigger parent re-renders. Comes with simple, native `persist` middleware.<br>**Tradeoff**: Lacks complex middleware ecosystems like Redux Sagas, but perfect for lightweight client state. |
-| **Shopify FlashList** | Standard FlatList | **Justification**: Reuses cell views to prevent garbage collection spikes. Ideal for smooth scrolling in long lists.<br>**Tradeoff**: Requires careful item layout sizing to prevent visual layout shifts during view recycling. |
-| **Zustand Persist + AsyncStorage** | SQLite / WatermelonDB | **Justification**: Quick to implement, lightweight, and perfect for simple state persistence like user preferences and offline sync queues.<br>**Tradeoff**: Not suited for complex relational databases, but highly sufficient for queue/preference operations. |
-| **react-native-keychain** | AsyncStorage | **Justification**: Secures sensitive authorization tokens in the iOS Keychain and Android Keystore, preventing token theft through standard storage inspection.<br>**Tradeoff**: Slightly more complex API, but critical for enterprise security compliance. |
-| **Generic `useCommunityJoinQueue` Hook** | Inline Screen Mutations | **Justification**: Extracted standard community join/leave queue/optimistic logic into a shared [useCommunityJoinQueue](file:///Users/kuldeep/kuldeep/communityHub/src/hooks/useCommunityJoinQueue.ts) hook. Both details and list views now use a unified path for joining.<br>**Tradeoff**: Slight abstraction, but guarantees identical offline/online sync logic across the app. |
-
----
-
-## 🛠️ Setup & Running Instructions
-
-### Prerequisites
-Before running, make sure your machine has the following tools set up:
-*   **Node.js**: Version 18.x or 20.x
-*   **Yarn** or **npm**
-*   **Watchman**: `brew install watchman` (macOS)
-*   **CocoaPods**: For iOS dependencies (`sudo gem install cocoapods`)
-*   **Xcode** & **Android Studio** configured with simulators/emulators.
-
-### 🌐 Backend Service Configuration
-The API and database server are hosted in a separate Git repository:
-*   **Backend Repo**: [hi-kuldeep/community-hub-backend](https://github.com/hi-kuldeep/community-hub-backend)
-Please follow the instructions in the backend repository to set up and run the server before launching this mobile application.
-
-### 1. Installation
-Clone the repository and install dependency packages:
-```bash
-# Install node packages
-yarn install
-# or
-npm install
-```
-
-If targetting iOS, configure and install CocoaPods:
-```bash
-cd ios
-pod install
-cd ..
-```
-
-### 2. Launching the App
-1.  **Start Metro Bundler**:
-    ```bash
-    yarn start
-    ```
-2.  **Run Application**:
-    *   **iOS**: `yarn ios`
-    *   **Android**: `yarn android`
+| Decision | Choice | Why | Tradeoff |
+| :--- | :--- | :--- | :--- |
+| **Remote Data & Caching** | React Query (TanStack) | Handles remote caching, queries/mutations, automatic retries, pagination, and caching out of the box. | Requires understanding stale/cache timers, but drastically cuts async state boilerplate. |
+| **Lightweight Global Client State** | Zustand | Zero-boilerplate global state management. Extremely lightweight, performant, and does not trigger parent re-renders. | Lacks complex middleware ecosystems like Redux Sagas, but perfect for lightweight client state. |
+| **High-Performance List Rendering** | `@shopify/flash-list` | Reuses cell views to prevent garbage collection spikes. Ideal for maintaining 60fps scrolling in long lists. | Requires careful item layout sizing to prevent visual layout shifts during view recycling. |
+| **Local Cache & Queue Persistence** | Zustand Persist + AsyncStorage | Quick to implement, lightweight, and perfect for simple state persistence like user preferences and offline sync queues. | Not suited for complex relational databases, but highly sufficient for queue/preference operations. |
+| **Secure Credential Management** | `react-native-keychain` | Secures sensitive authorization tokens in the iOS Keychain and Android Keystore, preventing token theft through standard storage inspection. | Slightly more complex API, but critical for enterprise security compliance. |
+| **Shared Offline Queue Handler** | Generic `useCommunityJoinQueue` Hook | Extracted standard community join/leave queue/optimistic logic into a shared custom hook. Detail and list views use a unified path for joining. | Slight abstraction, but guarantees identical offline/online sync logic across the app. |
 
 ---
 
