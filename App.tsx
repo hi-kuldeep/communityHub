@@ -21,6 +21,7 @@ import useOfflineQueueSync from '@/hooks/useOfflineQueueSync';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import OfflineBanner from '@/components/OfflineBanner';
 import NetInfo from '@react-native-community/netinfo';
+import { hideSplash } from 'react-native-splash-view';
 
 // Configure once during app startup
 NetInfo.configure({
@@ -48,6 +49,11 @@ function App(): React.JSX.Element {
 
   // Start background queue synchronization listener
   useOfflineQueueSync();
+
+  // Hide native splash screen
+  React.useEffect(() => {
+    hideSplash();
+  }, []);
 
   const baseTheme = isDarkMode ? DarkTheme : DefaultTheme;
 
