@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
+import { View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import CustomText from '@/components/CustomText';
 import Avatar from '@/components/imageComponent/Avatar';
@@ -142,4 +138,3 @@ const PostCard: React.FC<PostCardProps> = React.memo(
 );
 
 export default PostCard;
-

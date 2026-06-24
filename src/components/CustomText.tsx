@@ -17,7 +17,10 @@ import { getColors, ThemeColor } from '@/theme/colors';
 import { theme, TypographyPreset } from '@/theme';
 import { spacingStyle } from '@/types/styleType';
 import { useThemeStore } from '@/store/useThemeStore';
-import { capitalizeString, fontSizePixelRatio } from '@/utils/developmentFunctions';
+import {
+  capitalizeString,
+  fontSizePixelRatio,
+} from '@/utils/developmentFunctions';
 
 export type TypographySize = keyof typeof theme.typography.sizes;
 
@@ -95,7 +98,10 @@ export default function CustomText({
   let resolvedPropFontSize: number | undefined;
   if (typeof fontSize === 'number') {
     resolvedPropFontSize = fontSize;
-  } else if (typeof fontSize === 'string' && fontSize in theme.typography.sizes) {
+  } else if (
+    typeof fontSize === 'string' &&
+    fontSize in theme.typography.sizes
+  ) {
     resolvedPropFontSize = theme.typography.sizes[fontSize];
   }
 
@@ -115,7 +121,9 @@ export default function CustomText({
             color: resolvedColor,
             textAlign: textAlign ?? 'left',
             flex,
-            fontFamily: resolvedPreset?.fontFamily ?? (fontFamily ? FONTS?.[fontFamily] : FONTS.regular),
+            fontFamily:
+              resolvedPreset?.fontFamily ??
+              (fontFamily ? FONTS?.[fontFamily] : FONTS.regular),
             fontSize: resolvedFontSize,
           },
           resolvedPreset && {
@@ -126,7 +134,9 @@ export default function CustomText({
           props,
           // Re-apply overrides if passed explicitly
           fontFamily ? { fontFamily: FONTS?.[fontFamily] } : undefined,
-          resolvedPropFontSize !== undefined ? { fontSize: fontSizePixelRatio(resolvedPropFontSize) } : undefined,
+          resolvedPropFontSize !== undefined
+            ? { fontSize: fontSizePixelRatio(resolvedPropFontSize) }
+            : undefined,
         ]}
         numberOfLines={handleNumberOfLines()}
         {...restProps}
@@ -144,8 +154,9 @@ export default function CustomText({
                   style={[
                     {
                       fontSize: fontSizePixelRatio(12),
-                      color: currentColors.text,
-                      fontFamily: FONTS.regular,
+                      color: currentColors.primary,
+                      fontFamily: FONTS.semiBold,
+                      textDecorationLine: 'underline',
                     },
                     loadMoreStyle,
                   ]}
